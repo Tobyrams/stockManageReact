@@ -3,7 +3,7 @@ import { DrawerComponent } from "../components";
 
 function Dashboard() {
   return (
-    <div className="">
+    <div>
       <h1 className="text-4xl">Dashboard</h1>
       <DrawerComponent />
     </div>

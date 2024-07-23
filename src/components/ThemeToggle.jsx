@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
 import { themeChange } from "theme-change";
 import toast from "react-hot-toast";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, Monitor } from "lucide-react";
 
 const ThemeToggle = () => {
-  const [currentTheme, setCurrentTheme] = useState("light");
+  const [currentTheme, setCurrentTheme] = useState("system");
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -12,10 +12,22 @@ const ThemeToggle = () => {
     // Initialize theme-change
     themeChange(false);
 
+    // Function to get system theme
+    const getSystemTheme = () =>
+      window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+
     // Check localStorage for saved theme
-    const savedTheme = localStorage.getItem("theme") || "light";
+    const savedTheme = localStorage.getItem("theme") || "system";
     setCurrentTheme(savedTheme);
-    document.documentElement.setAttribute("data-theme", savedTheme);
+
+    // Set initial theme
+    if (savedTheme === "system") {
+      document.documentElement.setAttribute("data-theme", getSystemTheme());
+    } else {
+      document.documentElement.setAttribute("data-theme", savedTheme);
+    }
 
     // Add event listener for theme change
     const observer = new MutationObserver((mutations) => {
@@ -31,33 +43,50 @@ const ThemeToggle = () => {
       attributeFilter: ["data-theme"],
     });
 
+    // Add event listener for system theme change
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleSystemThemeChange = (e) => {
+      if (currentTheme === "system") {
+        document.documentElement.setAttribute(
+          "data-theme",
+          e.matches ? "dark" : "light"
+        );
+      }
+    };
+    mediaQuery.addListener(handleSystemThemeChange);
+
     // Cleanup function
-    return () => observer.disconnect();
-  }, []);
+    return () => {
+      observer.disconnect();
+      mediaQuery.removeListener(handleSystemThemeChange);
+    };
+  }, [currentTheme]);
 
   const setTheme = (theme) => {
     if (theme !== currentTheme) {
-      document.documentElement.setAttribute("data-theme", theme);
+      if (theme === "system") {
+        const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+          .matches
+          ? "dark"
+          : "light";
+        document.documentElement.setAttribute("data-theme", systemTheme);
+      } else {
+        document.documentElement.setAttribute("data-theme", theme);
+      }
       localStorage.setItem("theme", theme);
       setCurrentTheme(theme);
     }
     setIsOpen(false);
-    if (theme === "dark") {
-      toast("DarkMode", {
-        icon: "🌚",
-        duration: 2000,
-        style: {
-          borderRadius: "10px",
-          background: "#333",
-          color: "#fff",
-        },
-      });
-    } else {
-      toast("LightMode", {
-        icon: "🌞",
-        duration: 2000,
-      });
-    }
+    toast(`${theme.charAt(0).toUpperCase() + theme.slice(1)} Mode`, {
+      icon:
+        theme === "dark" ? <Moon /> : theme === "light" ? <Sun /> : <Monitor />,
+      duration: 2000,
+      style: {
+        borderRadius: "10px",
+        background: theme === "dark" ? "#333" : "#fff",
+        color: theme === "dark" ? "#fff" : "#333",
+      },
+    });
   };
 
   const toggleDropdown = () => setIsOpen(!isOpen);
@@ -76,20 +105,15 @@ const ThemeToggle = () => {
   }, []);
 
   return (
-    <li ref={dropdownRef}>
-      <div className="dropdown dropdown-left ">
-        <div
-          tabIndex={0}
-          role="button"
-          className="cursor-pointer"
-          onClick={toggleDropdown}
-        >
+    <div ref={dropdownRef} onClick={toggleDropdown}>
+      <div className="dropdown dropdown-left">
+        <div tabIndex={0} role="button" className="cursor-pointer">
           Theme
         </div>
         {isOpen && (
           <ul
             tabIndex={0}
-            className="dropdown-content ring-1 ring-base-300 menu  bg-base-100 rounded-box z-[1]  w-32 p-2 shadow"
+            className="dropdown-content ring-1 ring-base-300 menu bg-base-100 rounded-box z-[1] w-32 p-2 shadow"
           >
             <li>
               <button
@@ -113,10 +137,21 @@ const ThemeToggle = () => {
                 Dark
               </button>
             </li>
+            <li>
+              <button
+                className={`theme-controller ${
+                  currentTheme === "system" ? "font-extrabold" : ""
+                }`}
+                onClick={() => setTheme("system")}
+              >
+                <Monitor size={20} />
+                System
+              </button>
+            </li>
           </ul>
         )}
       </div>
-    </li>
+    </div>
   );
 };
 

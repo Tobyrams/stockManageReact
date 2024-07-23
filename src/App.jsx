@@ -16,7 +16,7 @@ export default function App() {
     <Router>
       <div className=" min-h-screen animate__animated animate__fadeIn ">
         <Header />
-        <main>
+        <main className="p-5">
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/stock" element={<Stock />} />

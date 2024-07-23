@@ -6,6 +6,7 @@ import {
   Layers,
   LayoutDashboard,
   LogOut,
+  Menu,
   PackageSearch,
   ShoppingBasket,
 } from "lucide-react";
@@ -42,8 +43,8 @@ function SideBarComponent() {
   const getButtonClass = useCallback(
     (path) =>
       isActive(path)
-        ? "font-bold text-primary text-md" // Active state class
-        : "hover:text-gray-700 text-md", // Inactive state class
+        ? "font-bold text-base-content text-lg" // Active state class
+        : "text-gray-500 text-lg hover:font-medium hover:text-base-content", // Inactive state class
     [isActive] // Dependency for useCallback
   );
 
@@ -53,8 +54,11 @@ function SideBarComponent() {
         <input id="my-drawer" type="checkbox" className="drawer-toggle" />
         <div className="drawer-content">
           {/* Page content here */}
-          <label htmlFor="my-drawer" className="btn bg-base-100 drawer-button">
-            <i className="fa-solid fa-bars fa-xl"></i>
+          <label
+            htmlFor="my-drawer"
+            className="btn btn-ghost bg-base-100 drawer-button"
+          >
+            <Menu size={25} />
           </label>
         </div>
         <div className="drawer-side z-10 ">
@@ -65,9 +69,9 @@ function SideBarComponent() {
           ></label>
           <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4">
             {/* Sidebar content here */}
-            <h1 className="text-2xl font-medium py-4 border-b-2">Tadinda.</h1>
+            <h1 className="text-2xl font-medium py-2 border-b-2">Tadinda.</h1>
 
-            <li>
+            <li className="pt-4">
               <button
                 onClick={() => handleNavLinkClick("/")}
                 className={getButtonClass("/")}
