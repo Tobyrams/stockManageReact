@@ -13,7 +13,7 @@ import { Header } from "./components";
 export default function App() {
   return (
     <Router>
-      <div className=" min-h-screen w-[100vw]">
+      <div className=" min-h-screen animate__animated animate__fadeIn ">
         <Header />
         <main>
           <Routes>

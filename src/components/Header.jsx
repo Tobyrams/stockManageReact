@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import SideBarComponent from "./SideBarComponent";
 import ProfileModal from "./ProfileModal";
+import ThemeToggle from "./ThemeToggle";
 
 function Header() {
   const location = useLocation();
+  //   const [isOpen, setIsOpen] = useState(false);
+  //   const dropdownRef = useRef(null);
 
   const getPageTitle = () => {
     switch (location.pathname) {
@@ -25,9 +28,24 @@ function Header() {
     }
   };
 
+  //   const toggleDropdown = () => setIsOpen(!isOpen);
+
+  //   useEffect(() => {
+  //     const handleClickOutside = (event) => {
+  //       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+  //         setIsOpen(false);
+  //       }
+  //     };
+
+  //     document.addEventListener("mousedown", handleClickOutside);
+  //     return () => {
+  //       document.removeEventListener("mousedown", handleClickOutside);
+  //     };
+  //   }, []);
+
   return (
     <>
-      <div className="navbar shadow bg-base-100">
+      <div className="navbar shadow-md bg-base-100">
         <div className="flex-none">
           <SideBarComponent />
         </div>
@@ -35,7 +53,7 @@ function Header() {
           <span className="text-2xl font-semibold pl-2">{getPageTitle()}</span>
         </div>
         <div className="flex-none">
-          <div class="dropdown dropdown-end">
+          <div className="dropdown dropdown-end">
             <button className="btn btn-square btn-ghost">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -52,18 +70,13 @@ function Header() {
               </svg>
             </button>
             <ul
-              tabindex="0"
-              class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
+              tabIndex="0"
+              className="menu menu-sm dropdown-content ring-1 ring-base-300 bg-base-100 rounded-box z-[1] mt-3 w-40 p-2 shadow-md"
             >
               <li>
                 <ProfileModal />
               </li>
-              <li>
-                <a class="justify-between">
-                  Profile
-                  <span class="badge">New</span>
-                </a>
-              </li>
+              <ThemeToggle />
               <li>
                 <a>Settings</a>
               </li>
