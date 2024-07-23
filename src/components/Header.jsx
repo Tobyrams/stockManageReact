@@ -10,7 +10,7 @@ function Header() {
 
   const getPageTitle = () => {
     switch (location.pathname) {
-      case "/":
+      case "/dashboard":
         return "Dashboard";
       case "/stock":
         return "Stock";
@@ -23,7 +23,7 @@ function Header() {
       case "/finances":
         return "Finances";
       default:
-        return "Dashboard";
+        return "";
     }
   };
 

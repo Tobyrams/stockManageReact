@@ -73,8 +73,8 @@ function SideBarComponent() {
 
             <li className="pt-4">
               <button
-                onClick={() => handleNavLinkClick("/")}
-                className={getButtonClass("/")}
+                onClick={() => handleNavLinkClick("/dashboard")}
+                className={getButtonClass("/dashboard")}
               >
                 <LayoutDashboard />
                 Dashboard
@@ -127,8 +127,8 @@ function SideBarComponent() {
             </li>
             <li>
               <button
-                onClick={() => handleNavLinkClick("/logout")}
-                className={getButtonClass("/logout")}
+                onClick={() => handleNavLinkClick("/")}
+                className={getButtonClass("/login")}
               >
                 <LogOut />
                 Logout

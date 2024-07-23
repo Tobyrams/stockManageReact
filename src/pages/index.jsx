@@ -4,5 +4,14 @@ import Ingredients from "./Ingredients";
 import Product from "./Product";
 import Analytics from "./Analytics";
 import Finances from "./Finances";
+import LoginPage from "./LoginPage";
 
-export { Dashboard, Stock, Ingredients, Product, Analytics, Finances };
+export {
+  LoginPage,
+  Dashboard,
+  Stock,
+  Ingredients,
+  Product,
+  Analytics,
+  Finances,
+};
