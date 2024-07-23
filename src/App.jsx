@@ -9,6 +9,7 @@ import {
   Finances,
 } from "./pages";
 import { Header } from "./components";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
             <Route path="/finances" element={<Finances />} />
           </Routes>
         </main>
+        <Toaster />
       </div>
     </Router>
   );

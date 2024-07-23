@@ -1,5 +1,5 @@
 import React from "react";
-import { DrawerComponent, ThemeToggle } from "../components";
+import { DrawerComponent } from "../components";
 
 function Dashboard() {
   return (

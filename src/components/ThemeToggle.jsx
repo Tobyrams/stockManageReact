@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { themeChange } from "theme-change";
+import toast from "react-hot-toast";
+import { Moon, Sun } from "lucide-react";
 
 const ThemeToggle = () => {
   const [currentTheme, setCurrentTheme] = useState("light");
@@ -40,6 +42,22 @@ const ThemeToggle = () => {
       setCurrentTheme(theme);
     }
     setIsOpen(false);
+    if (theme === "dark") {
+      toast("DarkMode", {
+        icon: "🌚",
+        duration: 2000,
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+    } else {
+      toast("LightMode", {
+        icon: "🌞",
+        duration: 2000,
+      });
+    }
   };
 
   const toggleDropdown = () => setIsOpen(!isOpen);
@@ -59,11 +77,11 @@ const ThemeToggle = () => {
 
   return (
     <li ref={dropdownRef}>
-      <div className="dropdown dropdown-left">
+      <div className="dropdown dropdown-left ">
         <div
           tabIndex={0}
           role="button"
-          className="cursor-pointer w-full"
+          className="cursor-pointer"
           onClick={toggleDropdown}
         >
           Theme
@@ -71,7 +89,7 @@ const ThemeToggle = () => {
         {isOpen && (
           <ul
             tabIndex={0}
-            className="dropdown-content ring-1 ring-base-300 menu bg-base-100 rounded-box z-[1]  w-32 p-2 shadow"
+            className="dropdown-content ring-1 ring-base-300 menu  bg-base-100 rounded-box z-[1]  w-32 p-2 shadow"
           >
             <li>
               <button
@@ -80,6 +98,7 @@ const ThemeToggle = () => {
                 }`}
                 onClick={() => setTheme("light")}
               >
+                <Sun size={20} />
                 Light
               </button>
             </li>
@@ -90,6 +109,7 @@ const ThemeToggle = () => {
                 }`}
                 onClick={() => setTheme("dark")}
               >
+                <Moon size={20} />
                 Dark
               </button>
             </li>

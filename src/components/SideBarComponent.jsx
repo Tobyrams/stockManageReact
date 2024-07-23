@@ -10,36 +10,41 @@ import {
   ShoppingBasket,
 } from "lucide-react";
 
+// Main sidebar component
 function SideBarComponent() {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const navigate = useNavigate(); // Hook to navigate programmatically
+  const location = useLocation(); // Hook to access current location
 
+  // Function to close the drawer, called when a link is clicked
   const closeDrawer = useCallback(() => {
     const drawerToggle = document.getElementById("my-drawer");
     if (drawerToggle) {
-      drawerToggle.checked = false;
+      drawerToggle.checked = false; // Uncheck the drawer toggle to close it
     }
   }, []);
 
+  // Function to handle navigation link clicks
   const handleNavLinkClick = useCallback(
     (to) => {
-      closeDrawer();
-      navigate(to);
+      closeDrawer(); // Close the drawer
+      navigate(to); // Navigate to the target path
     },
-    [closeDrawer, navigate]
+    [closeDrawer, navigate] // Dependencies for useCallback
   );
 
+  // Function to check if the current path matches the given path
   const isActive = useCallback(
     (path) => location.pathname === path,
-    [location]
+    [location] // Dependency for useCallback
   );
 
+  // Function to get the tailwind class for a button based on its active state
   const getButtonClass = useCallback(
     (path) =>
       isActive(path)
-        ? "font-bold text-gray-800 text-md"
-        : "hover:text-gray-700 text-md",
-    [isActive]
+        ? "font-bold text-primary text-md" // Active state class
+        : "hover:text-gray-700 text-md", // Inactive state class
+    [isActive] // Dependency for useCallback
   );
 
   return (
@@ -52,7 +57,7 @@ function SideBarComponent() {
             <i className="fa-solid fa-bars fa-xl"></i>
           </label>
         </div>
-        <div className="drawer-side ">
+        <div className="drawer-side z-10 ">
           <label
             htmlFor="my-drawer"
             aria-label="close sidebar"
