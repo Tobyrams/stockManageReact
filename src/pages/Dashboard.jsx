@@ -1,59 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { DrawerComponent } from "../components";
-import { supabase } from "../supabaseClient"; // Ensure this import is correct
-import toast from "react-hot-toast";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { BackgroundTexture } from "../components";
+import { useStockSubscription } from "../hooks/useStockSubscription";
+
 function Dashboard() {
   const navigate = useNavigate();
+  const { stockItems, lowStockItems } = useStockSubscription();
 
-  // State to store the list of stock items
-  const [stockItems, setStockItems] = useState([]);
-
-  // State to store the list of low stock items
-  const [lowStockItems, setLowStockItems] = useState([]);
-
-  // Fetch stock items when the component mounts
-  useEffect(() => {
-    fetchStockItems();
-    fetchLowStockItems();
-  }, []);
-
-  // Function to fetch stock items from Supabase
-  async function fetchStockItems() {
-    try {
-      // Query the 'stocks' table, selecting name and expiry fields, ordered by expiry date
-      const { data, error } = await supabase
-        .from("stocks")
-        .select("name, expiry")
-        .order("expiry", { ascending: true });
-
-      if (error) throw error;
-      setStockItems(data);
-    } catch (error) {
-      toast.error("Failed to fetch stock items");
-      console.error("Error fetching stock items:", error);
-    }
-  }
-
-  // Function to fetch low stock items from Supabase
-  async function fetchLowStockItems() {
-    try {
-      const { data, error } = await supabase
-        .from("stocks")
-        .select("name, quantity")
-        .lte("quantity", 10)
-        .order("quantity", { ascending: true });
-
-      if (error) throw error;
-      setLowStockItems(data);
-    } catch (error) {
-      toast.error("Failed to fetch low stock items");
-      console.error("Error fetching low stock items:", error);
-    }
-  }
-
-  // Function to calculate the status of an item based on its expiry date
   const calculateStatus = (expiryDate) => {
     const today = new Date();
     const expiry = new Date(expiryDate);

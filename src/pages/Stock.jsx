@@ -3,13 +3,13 @@ import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { ChevronDown, ChevronUp, Pencil, Trash2 } from "lucide-react";
 import { supabase } from "../supabaseClient";
+import { useStockSubscription_StockPG } from "../hooks/useStockSubscription";
 
 const Stock = ({ isAdmin, session }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [stocks, setStocks] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [sortField, setSortField] = useState("name");
   const [sortOrder, setSortOrder] = useState("asc");
+  const { stocks, isLoading } = useStockSubscription_StockPG();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newItem, setNewItem] = useState({
@@ -26,29 +26,6 @@ const Stock = ({ isAdmin, session }) => {
   const [progress, setProgress] = useState(100);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [deleteTimer, setDeleteTimer] = useState(null);
-
-  useEffect(() => {
-    fetchStocks();
-  }, []);
-
-  const fetchStocks = async () => {
-    // Set loading to true before fetching data
-    setIsLoading(true);
-    const { data, error } = await supabase
-      .from("stocks")
-      .select("*")
-      .order("name", { ascending: true });
-
-    if (error) {
-      toast.error("Error fetching stocks", {
-        icon: "🚨",
-      });
-    } else {
-      setStocks(data);
-    }
-    // Set loading to false after data is fetched
-    setIsLoading(false);
-  };
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
@@ -80,7 +57,6 @@ const Stock = ({ isAdmin, session }) => {
       toast.error("Error adding new item");
     } else {
       toast.success("New item added!");
-      fetchStocks();
       handleModalClose();
     }
   };
@@ -111,7 +87,6 @@ const Stock = ({ isAdmin, session }) => {
       toast.error("Error updating item");
     } else {
       toast.success("Item updated successfully");
-      fetchStocks();
       handleEditModalClose();
     }
   };
@@ -161,7 +136,6 @@ const Stock = ({ isAdmin, session }) => {
       toast.error("Error deleting item");
     } else {
       toast.success("Item deleted successfully");
-      fetchStocks();
     }
   };
 
