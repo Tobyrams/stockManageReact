@@ -1,8 +1,9 @@
 import React, { useRef } from "react";
 import "daisyui/dist/full.css"; // Import DaisyUI styles
 import DrawerComponent from "./DrawerComponent";
+import { User, UserRoundPen } from "lucide-react";
 
-const ProfileModal = () => {
+const ProfileModal = ({ isAdmin, session }) => {
   const modalRef = useRef(null);
 
   const openModal = () => {
@@ -25,9 +26,10 @@ const ProfileModal = () => {
         >
           <div className="modal-box flex flex-col gap-4 ring-2 ring-base-200">
             {/* Modal Heading */}
-
-            <i class="fa-regular fa-user fa-2xl pt-2"></i>
-            <h1 class="text-xl font-medium text-center">Profile</h1>
+            <div className="flex items-center gap-2">
+              {isAdmin ? <UserRoundPen /> : <User />}
+              <h1 className="text-xl font-medium text-center">Profile</h1>
+            </div>
 
             {/* Modal Content Section*/}
             <section>
@@ -46,20 +48,24 @@ const ProfileModal = () => {
                     <tr>
                       <td>
                         <div className="flex items-center gap-3">
-                          <div className="avatar">
+                          {/* <div className="avatar">
                             <div className="mask mask-squircle h-12 w-12">
                               <img
                                 src="https://img.daisyui.com/images/profile/demo/2@94.webp"
                                 alt="Avatar Tailwind CSS Component"
                               />
                             </div>
-                          </div>
+                          </div> */}
                           <div>
-                            <div className="font-medium">Hart Hagerty</div>
+                            <div className="font-medium">
+                              {session.user.email}
+                            </div>
                           </div>
                         </div>
                       </td>
-                      <td className="font-medium">Admin</td>
+                      <td className="font-medium">
+                        {isAdmin ? "Admin" : "User"}
+                      </td>
                     </tr>
                   </tbody>
                   {/* foot */}

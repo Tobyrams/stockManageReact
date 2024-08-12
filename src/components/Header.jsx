@@ -4,8 +4,11 @@ import SideBarComponent from "./SideBarComponent";
 import ProfileModal from "./ProfileModal";
 import ThemeToggle from "./ThemeToggle";
 import { Ellipsis, LogOut } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "../supabaseClient";
+import { toast } from "react-hot-toast";
 
-function Header() {
+function Header({ isAdmin, session }) {
   const location = useLocation();
 
   const getPageTitle = () => {
@@ -27,13 +30,21 @@ function Header() {
     }
   };
 
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast.success("Logged out successfully");
+    navigate("/login");
+  };
+
   return (
     <>
       {/* Navbar */}
       <nav className="navbar shadow-md bg-base-100">
         {/* Sidebar Component */}
         <div className="flex-none">
-          <SideBarComponent />
+          <SideBarComponent isAdmin={isAdmin} />
         </div>
 
         {/* Header Title */}
@@ -54,7 +65,7 @@ function Header() {
               className="menu menu-sm dropdown-content ring-1 ring-base-300 bg-base-100 rounded-box z-[1] mt-3 w-40 p-2 shadow-md "
             >
               <li>
-                <ProfileModal />
+                <ProfileModal isAdmin={isAdmin} session={session} />
               </li>
               <li>
                 <ThemeToggle />
@@ -63,9 +74,9 @@ function Header() {
                 <a>Settings</a>
               </li>
               <li>
-                <a>
+                <button onClick={handleLogout}>
                   Logout <LogOut size={17} />
-                </a>
+                </button>
               </li>
             </ul>
           </div>

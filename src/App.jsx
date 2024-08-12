@@ -3,50 +3,121 @@ import {
   BrowserRouter as Router,
   Route,
   Routes,
-  useLocation,
+  Navigate,
+  Outlet,
 } from "react-router-dom";
 import {
-  LoginPage,
-  Dashboard,
-  Stock,
-  Ingredients,
-  Product,
   Analytics,
   Finances,
+  Ingredients,
+  LoginPage,
+  Product,
+  Stock,
+  AdminDashboard,
 } from "./pages";
-import { Header } from "./components";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { Dashboard } from "./pages";
 import { Toaster } from "react-hot-toast";
+import { useState, useEffect } from "react";
+import { supabase } from "./supabaseClient";
 
 function App() {
+  // State variables
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Function to check user role
+  const checkUserRole = async () => {
+    if (!session?.user?.id) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // Query Supabase to get user role
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("role_id")
+        .eq("id", session.user.id)
+        .single();
+
+      if (error) throw error;
+
+      // Set isAdmin to true if role_id is 2
+      setIsAdmin(data.role_id === 2);
+    } catch (error) {
+      console.error("Error fetching user role:", error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Effect to set up auth state listener
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+      }
+    );
+
+    // Cleanup function to unsubscribe
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+
+  // Effect to check user role when session changes
+  useEffect(() => {
+    if (session) {
+      checkUserRole();
+      console.log(isAdmin);
+    }
+  }, [session]);
+
   return (
     <Router>
-      <div className="bg-base-100 min-h-screen animate__animated animate__fadeIn font-poppins">
-        <Content />
-      </div>
+      {/* Toast notifications */}
       <Toaster />
+      <Routes>
+        {/* Public route */}
+        <Route path="/login" element={<LoginPage />} />
+
+        {/* Protected routes */}
+        <Route element={<ProtectedRoute isAdmin={isAdmin} session={session} />}>
+          <Route path="/dashboard" element={<Dashboard isAdmin={isAdmin} />} />
+          <Route
+            path="/stock"
+            element={<Stock isAdmin={isAdmin} session={session} />}
+          />
+          <Route
+            path="/ingredients"
+            element={<Ingredients isAdmin={isAdmin} session={session} />}
+          />
+          <Route
+            path="/product"
+            element={<Product isAdmin={isAdmin} session={session} />}
+          />
+          <Route
+            path="/analytics"
+            element={<Analytics isAdmin={isAdmin} session={session} />}
+          />
+          <Route
+            path="/finances"
+            element={<Finances isAdmin={isAdmin} session={session} />}
+          />
+          <Route
+            path="/admin"
+            element={<AdminDashboard isAdmin={isAdmin} session={session} />}
+          />
+        </Route>
+
+        {/* Redirect all other routes to login */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
     </Router>
-  );
-}
-
-function Content() {
-  const location = useLocation();
-  const hideHeaderPaths = ["/"];
-
-  return (
-    <>
-      {!hideHeaderPaths.includes(location.pathname) && <Header />}
-      <main className="p-5">
-        <Routes>
-          <Route path="/" element={<LoginPage />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/stock" element={<Stock />} />
-          <Route path="/ingredients" element={<Ingredients />} />
-          <Route path="/product" element={<Product />} />
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/finances" element={<Finances />} />
-        </Routes>
-      </main>
-    </>
   );
 }
 

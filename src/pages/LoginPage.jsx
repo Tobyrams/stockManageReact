@@ -1,27 +1,31 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
+import { supabase } from "../supabaseClient";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    // Simulate authentication logic (e.g., API call)
-    const isAuthenticated = email === "admin@gmail.com" && password === "admin";
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (isAuthenticated) {
+      if (error) throw error;
+
       // Redirect to the dashboard
       navigate("/dashboard");
-      toast.success(`Welcome ${email} `, {
+      toast.success(`Welcome ${email}`, {
         duration: 3000,
       });
-    } else {
-      // Handle authentication failure (e.g., show an error message)
-      toast.error("Incorrect Email or Password! ");
+    } catch (error) {
+      toast.error(error.message || "An error occurred during login");
     }
   };
 
@@ -70,14 +74,6 @@ const LoginPage = () => {
             </div>
           </form>
         </div>
-      </div>
-      <div className="text-center mt-8 mb-28">
-        <p className="text-sm">
-          Do you have an account?
-          <a href="#" className="link hover:text-primary ml-1">
-            Register
-          </a>
-        </p>
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import Product from "./Product";
 import Analytics from "./Analytics";
 import Finances from "./Finances";
 import LoginPage from "./LoginPage";
+import AdminDashboard from "./AdminDashboard";
 
 export {
   LoginPage,
@@ -14,4 +15,5 @@ export {
   Product,
   Analytics,
   Finances,
+  AdminDashboard,
 };

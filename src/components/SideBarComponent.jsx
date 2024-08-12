@@ -8,11 +8,13 @@ import {
   LogOut,
   Menu,
   PackageSearch,
+  ShieldCheck,
   ShoppingBasket,
 } from "lucide-react";
+import { AdminDashboard } from "../pages";
 
 // Main sidebar component
-function SideBarComponent() {
+function SideBarComponent({ isAdmin }) {
   const navigate = useNavigate(); // Hook to navigate programmatically
   const location = useLocation(); // Hook to access current location
 
@@ -125,6 +127,17 @@ function SideBarComponent() {
                 Finances
               </button>
             </li>
+            {isAdmin && (
+              <li>
+                <button
+                  onClick={() => handleNavLinkClick("/admin")}
+                  className={getButtonClass("/admin")}
+                >
+                  <ShieldCheck s />
+                  <AdminDashboard />
+                </button>
+              </li>
+            )}
             <li>
               <button
                 onClick={() => handleNavLinkClick("/")}

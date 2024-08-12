@@ -1,5 +1,6 @@
 import React from "react";
 import { DrawerComponent } from "../components";
+import toast from "react-hot-toast";
 
 function Dashboard() {
   return (
