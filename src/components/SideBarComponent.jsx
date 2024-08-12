@@ -51,7 +51,7 @@ function SideBarComponent({ isAdmin }) {
   );
 
   return (
-    <>
+    <div className="font-poppins">
       <div className="drawer">
         <input id="my-drawer" type="checkbox" className="drawer-toggle" />
         <div className="drawer-content">
@@ -150,7 +150,7 @@ function SideBarComponent({ isAdmin }) {
           </ul>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

@@ -73,7 +73,6 @@ function App() {
   useEffect(() => {
     if (session) {
       checkUserRole();
-      console.log(isAdmin);
     }
   }, [session]);
 

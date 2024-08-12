@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 
 import { toast } from "react-hot-toast";
-import { Pencil, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Pencil, Trash2 } from "lucide-react";
 import { supabase } from "../supabaseClient";
 
 const Stock = ({ isAdmin, session }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [stocks, setStocks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [sortField, setSortField] = useState("name");
+  const [sortOrder, setSortOrder] = useState("asc");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newItem, setNewItem] = useState({
@@ -163,42 +165,92 @@ const Stock = ({ isAdmin, session }) => {
     }
   };
 
+  const handleSortChange = (e) => {
+    const [field, order] = e.target.value.split("-");
+    setSortField(field);
+    setSortOrder(order);
+  };
+
+  const sortedStocks = [...filteredStocks].sort((a, b) => {
+    if (a[sortField] < b[sortField]) return sortOrder === "asc" ? -1 : 1;
+    if (a[sortField] > b[sortField]) return sortOrder === "asc" ? 1 : -1;
+    return 0;
+  });
+
   return (
-    <div className="mt-6 font-poppins p-10">
-      <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-4">
+    <section className="mt-6 font-poppins p-5 sm:p-10">
+      <h2 className="text-lg sm:text-lg md:text-xl lg:text-2xl mb-4 font-medium opacity-60">
         Overview of current stock
       </h2>
-      <div className="flex mb-4">
+      {/* Action buttons */}
+      <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-6 xl:grid-cols-10 gap-2 mb-4">
         <input
           type="text"
           placeholder="Search stocks..."
-          className="input input-bordered w-full max-w-xs mr-2"
+          className="input input-bordered w-full max-w-xs mr-1"
           value={searchTerm}
           onChange={handleSearch}
         />
+        <select
+          className="select select-bordered mr-1"
+          value={`${sortField}-${sortOrder}`}
+          onChange={handleSortChange}
+        >
+          <option value="name-asc">Name (A-Z)</option>
+          <option value="name-desc">Name (Z-A)</option>
+          <option value="quantity-asc">Quantity (Low to High)</option>
+          <option value="quantity-desc">Quantity (High to Low)</option>
+          <option value="expiry-asc">Expiry (Earliest First)</option>
+          <option value="expiry-desc">Expiry (Latest First)</option>
+        </select>
+
         {isAdmin && (
           <button className="btn btn-primary" onClick={handleAddNew}>
             Add New Item
           </button>
         )}
       </div>
+
       <div className="card bg-base-100 shadow-xl ring-2 ring-base-300">
         <div className="card-body">
           <div className="overflow-x-auto">
-            <table className="table w-full">
+            <table className="table w-full table-zebra">
               <thead>
                 <tr>
-                  <th className="text-xs sm:text-sm md:text-base lg:text-lg">
-                    Name
+                  <th
+                    className="flex items-center text-xs sm:text-sm md:text-base lg:text-lg cursor-pointer"
+                    onClick={() =>
+                      handleSortChange({ target: { value: "name-asc" } })
+                    }
+                  >
+                    Name{" "}
+                    {sortField === "name" &&
+                      (sortOrder === "asc" ? <ChevronUp /> : <ChevronDown />)}
                   </th>
-                  <th className="text-xs sm:text-sm md:text-base lg:text-lg">
-                    Quantity
+                  <th
+                    className="  items-center text-xs sm:text-sm md:text-base lg:text-lg cursor-pointer"
+                    onClick={() =>
+                      handleSortChange({ target: { value: "quantity-asc" } })
+                    }
+                  >
+                    <div className="flex items-center ">
+                      Quantity{" "}
+                      {sortField === "quantity" &&
+                        (sortOrder === "asc" ? <ChevronUp /> : <ChevronDown />)}
+                    </div>
                   </th>
-                  <th className="text-xs sm:text-sm md:text-base lg:text-lg">
+                  <th className=" items-center text-xs sm:text-sm md:text-base lg:text-lg">
                     Unit
                   </th>
-                  <th className="text-xs sm:text-sm md:text-base lg:text-lg">
-                    Expiry
+                  <th
+                    className="flex  items-center text-xs sm:text-sm md:text-base lg:text-lg cursor-pointer"
+                    onClick={() =>
+                      handleSortChange({ target: { value: "expiry-asc" } })
+                    }
+                  >
+                    Expiry{" "}
+                    {sortField === "expiry" &&
+                      (sortOrder === "asc" ? <ChevronUp /> : <ChevronDown />)}
                   </th>
                   {isAdmin && (
                     <th className="text-xs sm:text-sm md:text-base lg:text-lg">
@@ -208,7 +260,6 @@ const Stock = ({ isAdmin, session }) => {
                 </tr>
               </thead>
               <tbody>
-                {/* Conditional rendering based on loading state */}
                 {isLoading
                   ? // If loading, render skeleton rows
                     Array(5)
@@ -237,7 +288,7 @@ const Stock = ({ isAdmin, session }) => {
                         </tr>
                       ))
                   : // If not loading, render actual stock data
-                    filteredStocks.map((stock) => (
+                    sortedStocks.map((stock) => (
                       <tr key={stock.id}>
                         <td>{stock.name}</td>
                         <td>{stock.quantity}</td>
@@ -246,13 +297,13 @@ const Stock = ({ isAdmin, session }) => {
                         {isAdmin && (
                           <td>
                             <button
-                              className="btn btn-sm btn-ghost mr-2"
+                              className="btn btn-md btn-ghost mr-2"
                               onClick={() => handleEdit(stock)}
                             >
                               <Pencil size={18} />
                             </button>
                             <button
-                              className="btn btn-sm btn-ghost text-error"
+                              className="btn btn-md btn-ghost text-error"
                               onClick={() => handleDelete(stock.id, stock.name)}
                             >
                               <Trash2 size={18} />
@@ -459,7 +510,8 @@ const Stock = ({ isAdmin, session }) => {
           {deleteConfirmation && (
             <>
               <p className="py-4">
-                Are you sure you want to delete "{deleteConfirmation.name}"?
+                Are you sure you want to delete "
+                <b>{deleteConfirmation.name}</b>"?
               </p>
               <div className="w-full bg-gray-300 rounded-full h-2.5 mb-4">
                 <div
@@ -482,7 +534,7 @@ const Stock = ({ isAdmin, session }) => {
           Close
         </label>
       </div>
-    </div>
+    </section>
   );
 };
 

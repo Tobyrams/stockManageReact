@@ -41,15 +41,17 @@ function Header({ isAdmin, session }) {
   return (
     <>
       {/* Navbar */}
-      <nav className="navbar shadow-md bg-base-100">
+      <nav className="navbar shadow-md bg-base-100 font-poppins">
         {/* Sidebar Component */}
         <div className="flex-none">
           <SideBarComponent isAdmin={isAdmin} />
         </div>
 
         {/* Header Title */}
-        <div className="flex-1">
-          <span className="text-2xl font-semibold pl-2">{getPageTitle()}</span>
+        <div className="flex justify-center text-center w-full items-center">
+          <span className="text-2xl md:text-3xl lg:text-4xl font-semibold pl-2 ">
+            {getPageTitle()}
+          </span>
         </div>
 
         {/* Dropdown */}
@@ -57,7 +59,7 @@ function Header({ isAdmin, session }) {
           <div className="dropdown dropdown-end">
             {/* Dropdown Btn */}
             <button className="btn btn-square btn-ghost">
-              <Ellipsis />
+              <Ellipsis size={30} />
             </button>
             {/* Dropdown Content */}
             <ul

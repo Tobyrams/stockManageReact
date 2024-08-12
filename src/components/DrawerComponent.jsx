@@ -4,7 +4,7 @@ function DrawerComponent() {
   return (
     <Drawer.Root>
       <Drawer.Trigger asChild>
-        <button className="z-[0] btn font-medium">Profile</button>
+        <button className="z-[0] btn font-medium">Drawer</button>
       </Drawer.Trigger>
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 bg-black/40" />

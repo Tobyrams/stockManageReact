@@ -4,8 +4,8 @@ import toast from "react-hot-toast";
 
 function Dashboard() {
   return (
-    <div>
-      <h1 className="text-4xl">Dashboard</h1>
+    <div className="p-10">
+      {/* <h1 className="text-4xl">Dashboard</h1> */}
       <DrawerComponent />
     </div>
   );
