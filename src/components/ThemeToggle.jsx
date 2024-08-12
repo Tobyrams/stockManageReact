@@ -120,7 +120,7 @@ const ThemeToggle = () => {
                 className={`theme-controller ${
                   currentTheme === "light" ? "font-extrabold" : ""
                 }`}
-                onClick={() => setTheme("lofi")}
+                onClick={() => setTheme("light")}
               >
                 <Sun size={20} />
                 Light

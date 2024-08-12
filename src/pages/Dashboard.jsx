@@ -28,7 +28,7 @@ function Dashboard() {
       <DrawerComponent />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div className="mt-8 bg-base-100 shadow-lg rounded-lg overflow-hidden ring-2  ring-base-300">
+        <div className="mt-8 bg-base-100 shadow-lg rounded-lg overflow-hidden ring-2  ring-base-300 ring-offset-1 ring-offset-base-300">
           {/* Header section with title and current date */}
           <div className="p-4 bg-base-100 flex items-center">
             <h2 className="text-2xl font-bold pr-5">Expiry Tracking</h2>
@@ -86,7 +86,7 @@ function Dashboard() {
         </div>
 
         {/* New Low Stock Items card */}
-        <div className="mt-8 bg-base-100 shadow-lg rounded-lg overflow-hidden ring-2  ring-base-300">
+        <div className="mt-8 bg-base-100 shadow-lg rounded-lg overflow-hidden ring-2 ring-base-300 ring-offset-1 ring-offset-base-300">
           <div className="p-4 bg-base-100 flex items-center justify-between ">
             <h2 className="text-2xl font-bold pr-5">Low Stock Items</h2>
             <button

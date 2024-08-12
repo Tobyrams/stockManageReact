@@ -6,6 +6,7 @@ import Analytics from "./Analytics";
 import Finances from "./Finances";
 import LoginPage from "./LoginPage";
 import AdminDashboard from "./AdminDashboard";
+import Settings from "./Settings";
 
 export {
   LoginPage,
@@ -16,4 +17,5 @@ export {
   Analytics,
   Finances,
   AdminDashboard,
+  Settings,
 };

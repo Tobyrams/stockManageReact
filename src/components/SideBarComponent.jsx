@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import {
   ChartLine,
   HandCoins,
+  Home,
   Layers,
   LayoutDashboard,
   LogOut,
@@ -78,10 +79,23 @@ function SideBarComponent({ isAdmin, session }) {
                 onClick={() => handleNavLinkClick("/dashboard")}
                 className={getButtonClass("/dashboard")}
               >
-                <LayoutDashboard size={20} />
+                <Home size={20} />
                 Dashboard
               </button>
             </li>
+            {isAdmin && (
+              <li>
+                <button
+                  onClick={() => handleNavLinkClick("/admin")}
+                  className={getButtonClass("/admin")}
+                >
+                  <>
+                    <ShieldCheck size={20} />
+                    Admin Dashboard
+                  </>
+                </button>
+              </li>
+            )}
             <li>
               <button
                 onClick={() => handleNavLinkClick("/stock")}
@@ -127,19 +141,7 @@ function SideBarComponent({ isAdmin, session }) {
                 Finances
               </button>
             </li>
-            {isAdmin && (
-              <li>
-                <button
-                  onClick={() => handleNavLinkClick("/admin")}
-                  className={getButtonClass("/admin")}
-                >
-                  <>
-                    <ShieldCheck size={20} />
-                    Admin Dashboard
-                  </>
-                </button>
-              </li>
-            )}
+
             <li>
               <button
                 onClick={() => handleNavLinkClick("/")}

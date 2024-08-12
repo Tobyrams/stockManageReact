@@ -3,7 +3,18 @@ import { useLocation } from "react-router-dom";
 import SideBarComponent from "./SideBarComponent";
 import ProfileModal from "./ProfileModal";
 import ThemeToggle from "./ThemeToggle";
-import { Ellipsis, LogOut } from "lucide-react";
+import {
+  BadgeDollarSign,
+  ChartLine,
+  Ellipsis,
+  Home,
+  Layers,
+  LogOut,
+  PackageSearch,
+  Settings,
+  ShieldCheck,
+  ShoppingBasket,
+} from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 import { toast } from "react-hot-toast";
@@ -14,19 +25,53 @@ function Header({ isAdmin, session }) {
   const getPageTitle = () => {
     switch (location.pathname) {
       case "/dashboard":
-        return "Dashboard";
+        return (
+          <div className="flex items-center gap-2">
+            <Home size={30} /> Dashboard
+          </div>
+        );
       case "/stock":
-        return "Stock";
+        return (
+          <div className="flex items-center gap-2">
+            <Layers size={30} /> Stock
+          </div>
+        );
       case "/ingredients":
-        return "Ingredients";
+        return (
+          <div className="flex items-center gap-2">
+            <ShoppingBasket size={30} /> Ingredients
+          </div>
+        );
       case "/product":
-        return "Product";
+        return (
+          <div className="flex items-center gap-2">
+            <PackageSearch size={30} /> Product
+          </div>
+        );
       case "/analytics":
-        return "Analytics";
+        return (
+          <div className="flex items-center gap-2">
+            <ChartLine size={30} /> Analytics
+          </div>
+        );
       case "/finances":
-        return "Finances";
+        return (
+          <div className="flex items-center gap-2">
+            <BadgeDollarSign size={30} /> Finances
+          </div>
+        );
       case "/admin":
-        return "Admin Dashboard";
+        return (
+          <div className="flex items-center gap-2">
+            <ShieldCheck size={30} /> Admin Dashboard
+          </div>
+        );
+      case "/settings":
+        return (
+          <div className="flex items-center gap-2">
+            <Settings size={30} /> Settings
+          </div>
+        );
       default:
         return "";
     }
@@ -75,7 +120,7 @@ function Header({ isAdmin, session }) {
                 <ThemeToggle />
               </li>
               <li>
-                <a>Settings</a>
+                <button onClick={() => navigate("/settings")}>Settings</button>
               </li>
               <li>
                 <button onClick={handleLogout}>

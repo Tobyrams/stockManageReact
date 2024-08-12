@@ -14,6 +14,7 @@ import {
   Product,
   Stock,
   AdminDashboard,
+  Settings,
 } from "./pages";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { Dashboard } from "./pages";
@@ -111,6 +112,10 @@ function App() {
           <Route
             path="/admin"
             element={<AdminDashboard isAdmin={isAdmin} session={session} />}
+          />
+          <Route
+            path="/settings"
+            element={<Settings isAdmin={isAdmin} session={session} />}
           />
         </Route>
 
