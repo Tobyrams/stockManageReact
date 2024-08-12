@@ -20,7 +20,7 @@ const ProtectedRoute = ({ isAdmin, session }) => {
     return (
       // Loading spinner
       <div className="flex items-center justify-center h-screen">
-        <div className="w-16 h-16 border-t-4 border-b-4 border-gray-500 rounded-full loading loading-dots "></div>
+        <div className="w-16 h-16 border-t-4 border-b-4 border-gray-500 rounded-full loading loading-ring  "></div>
       </div>
     );
   }

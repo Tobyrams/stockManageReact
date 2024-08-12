@@ -178,7 +178,7 @@ const Stock = ({ isAdmin, session }) => {
   });
 
   return (
-    <section className="mt-6 font-poppins p-5 sm:p-10">
+    <section className="mt-6 font-poppins p-5 sm:p-10 animate__animated animate__fadeIn ">
       <h2 className="text-lg sm:text-lg md:text-xl lg:text-2xl mb-4 font-medium opacity-60">
         Overview of current stock
       </h2>

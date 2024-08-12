@@ -14,7 +14,7 @@ import {
 import { AdminDashboard } from "../pages";
 
 // Main sidebar component
-function SideBarComponent({ isAdmin }) {
+function SideBarComponent({ isAdmin, session }) {
   const navigate = useNavigate(); // Hook to navigate programmatically
   const location = useLocation(); // Hook to access current location
 
@@ -60,7 +60,7 @@ function SideBarComponent({ isAdmin }) {
             htmlFor="my-drawer"
             className="btn btn-ghost bg-base-100 drawer-button"
           >
-            <Menu size={25} />
+            <Menu size={30} />
           </label>
         </div>
         <div className="drawer-side z-10 ">
@@ -78,7 +78,7 @@ function SideBarComponent({ isAdmin }) {
                 onClick={() => handleNavLinkClick("/dashboard")}
                 className={getButtonClass("/dashboard")}
               >
-                <LayoutDashboard />
+                <LayoutDashboard size={20} />
                 Dashboard
               </button>
             </li>
@@ -87,7 +87,7 @@ function SideBarComponent({ isAdmin }) {
                 onClick={() => handleNavLinkClick("/stock")}
                 className={getButtonClass("/stock")}
               >
-                <Layers />
+                <Layers size={20} />
                 Stock
               </button>
             </li>
@@ -96,7 +96,7 @@ function SideBarComponent({ isAdmin }) {
                 onClick={() => handleNavLinkClick("/ingredients")}
                 className={getButtonClass("/ingredients")}
               >
-                <ShoppingBasket />
+                <ShoppingBasket size={20} />
                 Ingredients
               </button>
             </li>
@@ -105,7 +105,7 @@ function SideBarComponent({ isAdmin }) {
                 onClick={() => handleNavLinkClick("/product")}
                 className={getButtonClass("/product")}
               >
-                <PackageSearch />
+                <PackageSearch size={20} />
                 Product
               </button>
             </li>
@@ -114,7 +114,7 @@ function SideBarComponent({ isAdmin }) {
                 onClick={() => handleNavLinkClick("/analytics")}
                 className={getButtonClass("/analytics")}
               >
-                <ChartLine />
+                <ChartLine size={20} />
                 Analytics
               </button>
             </li>
@@ -123,7 +123,7 @@ function SideBarComponent({ isAdmin }) {
                 onClick={() => handleNavLinkClick("/finances")}
                 className={getButtonClass("/finances")}
               >
-                <HandCoins />
+                <HandCoins size={20} />
                 Finances
               </button>
             </li>
@@ -133,8 +133,10 @@ function SideBarComponent({ isAdmin }) {
                   onClick={() => handleNavLinkClick("/admin")}
                   className={getButtonClass("/admin")}
                 >
-                  <ShieldCheck s />
-                  <AdminDashboard />
+                  <>
+                    <ShieldCheck size={20} />
+                    Admin Dashboard
+                  </>
                 </button>
               </li>
             )}

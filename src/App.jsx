@@ -20,6 +20,7 @@ import { Dashboard } from "./pages";
 import { Toaster } from "react-hot-toast";
 import { useState, useEffect } from "react";
 import { supabase } from "./supabaseClient";
+import "animate.css";
 
 function App() {
   // State variables

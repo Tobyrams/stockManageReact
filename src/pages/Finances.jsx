@@ -1,5 +1,7 @@
-function Finances() {
-  return <h1>Finances</h1>;
-}
+import React from "react";
+
+const Finances = () => {
+  return <div>this is the finace page</div>;
+};
 
 export default Finances;

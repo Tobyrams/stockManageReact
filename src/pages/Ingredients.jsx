@@ -5,6 +5,7 @@ import { toast } from "react-hot-toast";
 
 function Ingredients({ isAdmin, session }) {
   const [ingredients, setIngredients] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
@@ -21,9 +22,11 @@ function Ingredients({ isAdmin, session }) {
   }, []);
 
   async function fetchIngredients() {
+    setIsLoading(true);
     const { data, error } = await supabase.from("ingredients").select("*");
     if (error) console.error("Error fetching ingredients:", error);
     else setIngredients(data);
+    setIsLoading(false);
   }
 
   const handleDelete = async (id) => {
@@ -72,7 +75,7 @@ function Ingredients({ isAdmin, session }) {
   );
 
   return (
-    <div className="p-5 sm:p-10 font-poppins">
+    <div className="p-5 sm:p-10 font-poppins animate__animated animate__fadeIn ">
       <h2 className="text-lg sm:text-lg md:text-xl lg:text-2xl mb-4 font-medium opacity-60">
         Ingredients in each batch
       </h2>
@@ -114,43 +117,61 @@ function Ingredients({ isAdmin, session }) {
                 </tr>
               </thead>
               <tbody>
-                {filteredIngredients.map((ingredient) => (
-                  <tr
-                    key={ingredient.id}
-                    className="text-sm sm:text-base md:text-md lg:text-lg"
-                  >
-                    <td>{ingredient.product}</td>
-                    <td>
-                      <div className="flex flex-col">
-                        {ingredient.ingredients.split(",").map((item) => (
-                          <div key={item}>{item},</div>
-                        ))}
-                      </div>
-                    </td>
-                    {isAdmin && (
-                      <td>
-                        <button
-                          className="btn btn-ghost btn-md mr-2"
-                          onClick={() => {
-                            setEditingIngredient(ingredient);
-                            setIsEditModalVisible(true);
-                          }}
-                        >
-                          <Pencil size={18} />
-                        </button>
-                        <button
-                          className="btn btn-ghost btn-md text-error"
-                          onClick={() => {
-                            setDeletingIngredientId(ingredient.id);
-                            setIsDeleteModalVisible(true);
-                          }}
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </td>
-                    )}
-                  </tr>
-                ))}
+                {isLoading
+                  ? // Skeleton loader
+                    Array.from({ length: 3 }).map((_, index) => (
+                      <tr key={index} className="animate-pulse">
+                        <td>
+                          <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                        </td>
+                        <td>
+                          <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+                        </td>
+                        {isAdmin && (
+                          <td>
+                            <div className="h-4 bg-gray-300 rounded w-full"></div>
+                          </td>
+                        )}
+                      </tr>
+                    ))
+                  : // Actual data
+                    filteredIngredients.map((ingredient) => (
+                      <tr
+                        key={ingredient.id}
+                        className="text-sm sm:text-base md:text-md lg:text-lg"
+                      >
+                        <td>{ingredient.product}</td>
+                        <td>
+                          <div className="flex flex-col">
+                            {ingredient.ingredients.split(",").map((item) => (
+                              <div key={item}>{item},</div>
+                            ))}
+                          </div>
+                        </td>
+                        {isAdmin && (
+                          <td>
+                            <button
+                              className="btn btn-ghost btn-md mr-2"
+                              onClick={() => {
+                                setEditingIngredient(ingredient);
+                                setIsEditModalVisible(true);
+                              }}
+                            >
+                              <Pencil size={18} />
+                            </button>
+                            <button
+                              className="btn btn-ghost btn-md text-error"
+                              onClick={() => {
+                                setDeletingIngredientId(ingredient.id);
+                                setIsDeleteModalVisible(true);
+                              }}
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          </td>
+                        )}
+                      </tr>
+                    ))}
               </tbody>
             </table>
           </div>

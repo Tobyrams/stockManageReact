@@ -25,6 +25,8 @@ function Header({ isAdmin, session }) {
         return "Analytics";
       case "/finances":
         return "Finances";
+      case "/admin":
+        return "Admin Dashboard";
       default:
         return "";
     }
@@ -41,7 +43,7 @@ function Header({ isAdmin, session }) {
   return (
     <>
       {/* Navbar */}
-      <nav className="navbar shadow-md bg-base-100 font-poppins">
+      <nav className="navbar shadow-md bg-base-100 font-poppins relative z-10 ring-2 ring-base-300">
         {/* Sidebar Component */}
         <div className="flex-none">
           <SideBarComponent isAdmin={isAdmin} />
