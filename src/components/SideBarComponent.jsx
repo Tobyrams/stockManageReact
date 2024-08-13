@@ -12,7 +12,8 @@ import {
   ShieldCheck,
   ShoppingBasket,
 } from "lucide-react";
-import { AdminDashboard } from "../pages";
+import { toast } from "react-hot-toast";
+
 
 // Main sidebar component
 function SideBarComponent({ isAdmin, session }) {
@@ -50,6 +51,11 @@ function SideBarComponent({ isAdmin, session }) {
         : "text-gray-500 text-lg hover:font-medium hover:text-base-content", // Inactive state class
     [isActive] // Dependency for useCallback
   );
+
+  const handleLogout = async () => {
+    toast.success("Logged out");
+    handleNavLinkClick("/")
+  };
 
   return (
     <div className="font-poppins">
@@ -144,7 +150,7 @@ function SideBarComponent({ isAdmin, session }) {
 
             <li>
               <button
-                onClick={() => handleNavLinkClick("/")}
+                onClick={handleLogout}
                 className={getButtonClass("/login")}
               >
                 <LogOut />

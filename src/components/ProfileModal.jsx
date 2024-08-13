@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import "daisyui/dist/full.css"; // Import DaisyUI styles
 import DrawerComponent from "./DrawerComponent";
-import { User, UserRoundPen } from "lucide-react";
+import { User, User2, UserRoundPen } from "lucide-react";
 
 const ProfileModal = ({ isAdmin, session }) => {
   const modalRef = useRef(null);
@@ -17,7 +17,10 @@ const ProfileModal = ({ isAdmin, session }) => {
   return (
     <>
       <div onClick={openModal}>
-        <a>Profile</a>
+        <a className="flex items-center gap-1">
+          <User2 size={20} />
+          Profile
+        </a>
 
         <dialog
           id="SignUpBtn"

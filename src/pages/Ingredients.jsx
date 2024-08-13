@@ -4,9 +4,9 @@ import { Pencil, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 function Ingredients({ isAdmin, session }) {
+  // State declarations
   const [ingredients, setIngredients] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [newIngredient, setNewIngredient] = useState({
@@ -17,10 +17,12 @@ function Ingredients({ isAdmin, session }) {
   const [deletingIngredientId, setDeletingIngredientId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Fetch ingredients on component mount
   useEffect(() => {
     fetchIngredients();
   }, []);
 
+  // Function to fetch ingredients from Supabase
   async function fetchIngredients() {
     setIsLoading(true);
     const { data, error } = await supabase.from("ingredients").select("*");
@@ -29,6 +31,7 @@ function Ingredients({ isAdmin, session }) {
     setIsLoading(false);
   }
 
+  // Function to handle ingredient deletion
   const handleDelete = async (id) => {
     const { error } = await supabase.from("ingredients").delete().eq("id", id);
     if (error) console.error("Error deleting ingredient:", error);
@@ -39,6 +42,7 @@ function Ingredients({ isAdmin, session }) {
     }
   };
 
+  // Function to handle ingredient editing
   const handleEdit = async (e) => {
     e.preventDefault();
     const { error } = await supabase
@@ -53,13 +57,14 @@ function Ingredients({ isAdmin, session }) {
     }
   };
 
+  // Function to handle adding new ingredient
   const handleAdd = async (e) => {
     e.preventDefault();
     const { error } = await supabase.from("ingredients").insert(newIngredient);
     if (error) console.error("Error adding ingredient:", error);
     else {
       fetchIngredients();
-      setIsModalVisible(false);
+      window.add_ingredient_modal.close();
       setNewIngredient({
         product: "",
         ingredients: "",
@@ -68,6 +73,7 @@ function Ingredients({ isAdmin, session }) {
     }
   };
 
+  // Filter ingredients based on search term
   const filteredIngredients = ingredients.filter(
     (ingredient) =>
       ingredient.product.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -76,10 +82,12 @@ function Ingredients({ isAdmin, session }) {
 
   return (
     <div className="p-5 sm:p-10 font-poppins animate__animated animate__fadeIn ">
+      {/* Page title */}
       <h2 className="text-lg sm:text-lg md:text-xl lg:text-2xl mb-4 font-medium opacity-60 text-shadow">
         Ingredients in each batch
       </h2>
 
+      {/* Search and Add New Ingredient section */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 mb-4">
         <input
           type="text"
@@ -91,14 +99,14 @@ function Ingredients({ isAdmin, session }) {
         {isAdmin && (
           <button
             className="btn btn-primary"
-            onClick={() => setIsModalVisible(true)}
+            onClick={() => window.add_ingredient_modal.showModal()}
           >
             Add New Ingredient
           </button>
         )}
       </div>
 
-      {/* Card */}
+      {/* Ingredients table */}
       <div className="card bg-base-100 shadow-xl ring-2 ring-base-300">
         <div className="card-body">
           <div className="overflow-x-auto">
@@ -180,68 +188,78 @@ function Ingredients({ isAdmin, session }) {
         </div>
       </div>
 
-      {isModalVisible && (
-        <div className="modal modal-open">
-          <div className="modal-box">
-            <h3 className="font-bold text-lg mb-4">Add New Ingredient</h3>
-            <form onSubmit={handleAdd}>
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">Product Name</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="Enter product name"
-                  className="input input-bordered"
-                  value={newIngredient.product}
-                  onChange={(e) =>
-                    setNewIngredient({
-                      ...newIngredient,
-                      product: e.target.value,
-                    })
-                  }
-                  required
-                />
-              </div>
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">Ingredient Name</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="Enter ingredient name"
-                  className="input input-bordered"
-                  value={newIngredient.ingredients}
-                  onChange={(e) =>
-                    setNewIngredient({
-                      ...newIngredient,
-                      ingredients: e.target.value,
-                    })
-                  }
-                  required
-                />
-              </div>
-              <div className="modal-action">
-                <button type="submit" className="btn btn-primary">
-                  Add Ingredient
-                </button>
-                <button
-                  type="button"
-                  className="btn"
-                  onClick={() => setIsModalVisible(false)}
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
+      {/* Add New Ingredient Modal */}
+      <dialog id="add_ingredient_modal" className="modal">
+        <div className="modal-box">
+          <h3 className="font-semibold text-2xl sm:text-3xl md:text-4xl text-center mb-4 text-shadow">
+            Add New Ingredient
+          </h3>
+          <form onSubmit={handleAdd}>
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Product Name</span>
+              </label>
+              <input
+                type="text"
+                placeholder="Enter product name"
+                className="input input-bordered"
+                value={newIngredient.product}
+                onChange={(e) =>
+                  setNewIngredient({
+                    ...newIngredient,
+                    product: e.target.value,
+                  })
+                }
+                required
+              />
+            </div>
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Ingredient Name</span>
+              </label>
+              <input
+                type="text"
+                placeholder="Enter ingredient name"
+                className="input input-bordered"
+                value={newIngredient.ingredients}
+                onChange={(e) =>
+                  setNewIngredient({
+                    ...newIngredient,
+                    ingredients: e.target.value,
+                  })
+                }
+                required
+              />
+            </div>
+            <div className="modal-action">
+              <button type="submit" className="btn btn-primary">
+                Add Ingredient
+              </button>
+              <button
+                type="button"
+                className="btn"
+                onClick={() => window.add_ingredient_modal.close()}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
         </div>
-      )}
+        <form method="dialog" className="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
 
+      {/* Edit Ingredient Modal */}
       {isEditModalVisible && (
-        <div className="modal modal-open">
-          <div className="modal-box">
-            <h3 className="font-bold text-lg mb-4">Edit Ingredient</h3>
+        <div
+          className="modal modal-open"
+          onClick={() => setIsEditModalVisible(false)}
+        >
+          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-semibold text-2xl sm:text-3xl md:text-4xl text-center mb-4 text-shadow">
+              Edit Ingredient
+            </h3>
             <form onSubmit={handleEdit}>
               <div className="form-control">
                 <label className="label">
@@ -285,7 +303,7 @@ function Ingredients({ isAdmin, session }) {
                 </button>
                 <button
                   type="button"
-                  className="btn"
+                  className="btn "
                   onClick={() => setIsEditModalVisible(false)}
                 >
                   Cancel
@@ -296,9 +314,13 @@ function Ingredients({ isAdmin, session }) {
         </div>
       )}
 
+      {/* Delete Confirmation Modal */}
       {isDeleteModalVisible && (
-        <div className="modal modal-open">
-          <div className="modal-box">
+        <div
+          className="modal modal-open"
+          onClick={() => setIsDeleteModalVisible(false)}
+        >
+          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
             <h3 className="font-bold text-lg mb-4">Confirm Deletion</h3>
             <p>Are you sure you want to delete this ingredient?</p>
             <div className="modal-action">

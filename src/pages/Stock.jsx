@@ -46,7 +46,8 @@ const Stock = ({ isAdmin, session }) => {
     setIsModalOpen(true);
   };
 
-  const handleModalClose = () => {
+  const handleModalClose = (e) => {
+    e.preventDefault();
     setIsModalOpen(false);
     setNewItem({ name: "", quantity: "", unit: "", expiry: "" });
   };
@@ -192,9 +193,10 @@ const Stock = ({ isAdmin, session }) => {
         )}
       </div>
 
-      <span className="text-md text-gray-500 text-shadow">
-        <b>Today - </b> {new Date().toLocaleDateString()}
-      </span>
+      <p className="text-xl text-base-content text-shadow pb-5">
+        <span className="font-bold">Today's Date: </span>
+        {new Date().toLocaleDateString()}
+      </p>
 
       {/* Card */}
       <div className="card bg-base-100 shadow-xl ring-2 ring-base-300">
@@ -377,13 +379,13 @@ const Stock = ({ isAdmin, session }) => {
               <button type="submit" className="btn btn-primary">
                 Add Item
               </button>
-              <label
+              <button
                 htmlFor="add-item-modal"
                 className="btn"
                 onClick={handleModalClose}
               >
                 Cancel
-              </label>
+              </button>
             </div>
           </form>
         </div>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { themeChange } from "theme-change";
 import toast from "react-hot-toast";
-import { Moon, Sun, Monitor } from "lucide-react";
+import { Moon, Sun, Monitor, SunMoon } from "lucide-react";
 
 const ThemeToggle = () => {
   const [currentTheme, setCurrentTheme] = useState("system");
@@ -108,12 +108,15 @@ const ThemeToggle = () => {
     <div ref={dropdownRef} onClick={toggleDropdown}>
       <div className="dropdown dropdown-left">
         <div tabIndex={0} role="button" className="cursor-pointer">
-          Theme
+          <div className="flex items-center gap-1">
+            <SunMoon size={20} />
+            Theme
+          </div>
         </div>
         {isOpen && (
           <ul
             tabIndex={0}
-            className="dropdown-content ring-1 ring-base-300 menu bg-base-100 rounded-box z-[1] w-32 p-2 shadow"
+            className="dropdown-content mr-8 ring-2 ring-base-300 menu bg-base-100 rounded-sm z-[1] w-32 p-2 shadow"
           >
             <li>
               <button

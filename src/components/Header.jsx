@@ -18,9 +18,11 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 import { toast } from "react-hot-toast";
+import { Tooltip, Button } from "@material-tailwind/react";
 
 function Header({ isAdmin, session }) {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const getPageTitle = () => {
     switch (location.pathname) {
@@ -77,11 +79,9 @@ function Header({ isAdmin, session }) {
     }
   };
 
-  const navigate = useNavigate();
-
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    toast.success("Logged out successfully");
+    toast.success("Logged out");
     navigate("/login");
   };
 
@@ -105,13 +105,16 @@ function Header({ isAdmin, session }) {
         <div className="flex-none">
           <div className="dropdown dropdown-end">
             {/* Dropdown Btn */}
-            <button className="btn btn-square btn-ghost">
-              <Ellipsis size={30} />
-            </button>
+            <Tooltip content="More" placement="left">
+              <Button variant="text" size="sm" className="text-base-content">
+                <Ellipsis size={30} />
+              </Button>
+            </Tooltip>
+
             {/* Dropdown Content */}
             <ul
               tabIndex="0"
-              className="menu menu-sm dropdown-content ring-1 ring-base-300 bg-base-100 rounded-box z-[1] mt-3 w-40 p-2 shadow-md "
+              className="menu menu-md dropdown-content ring-2 ring-base-300 bg-base-100 rounded-sm z-[1] mt-3 w-40 p-2 shadow-md "
             >
               <li>
                 <ProfileModal isAdmin={isAdmin} session={session} />
@@ -120,11 +123,15 @@ function Header({ isAdmin, session }) {
                 <ThemeToggle />
               </li>
               <li>
-                <button onClick={() => navigate("/settings")}>Settings</button>
+                <button onClick={() => navigate("/settings")} className="flex items-center gap-1">
+                  <Settings size={20} />
+                  Settings
+                </button>
               </li>
               <li>
                 <button onClick={handleLogout}>
-                  Logout <LogOut size={17} />
+                <LogOut size={17} />
+                  Logout 
                 </button>
               </li>
             </ul>
