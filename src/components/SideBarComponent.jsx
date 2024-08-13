@@ -70,7 +70,7 @@ function SideBarComponent({ isAdmin, session }) {
             aria-label="close sidebar"
             className="drawer-overlay"
           ></label>
-          <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4">
+          <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4 ">
             {/* Sidebar content here */}
             <h1 className="text-2xl font-medium py-2 border-b-2">Tadinda.</h1>
 

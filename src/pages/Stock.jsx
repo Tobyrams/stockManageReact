@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
 
 import { toast } from "react-hot-toast";
-import { ChevronDown, ChevronUp, Pencil, Trash2 } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Minus,
+  Pencil,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { supabase } from "../supabaseClient";
 import { useStockSubscription_StockPG } from "../hooks/useStockSubscription";
 
@@ -153,7 +160,7 @@ const Stock = ({ isAdmin, session }) => {
 
   return (
     <section className="mt-6 font-poppins p-5 sm:p-10 animate__animated animate__fadeIn ">
-      <h2 className="text-lg sm:text-lg md:text-xl lg:text-2xl mb-4 font-medium opacity-60">
+      <h2 className="text-lg sm:text-lg md:text-xl lg:text-2xl mb-4 font-medium opacity-60 text-shadow">
         Overview of current stock
       </h2>
       {/* Action buttons */}
@@ -185,6 +192,11 @@ const Stock = ({ isAdmin, session }) => {
         )}
       </div>
 
+      <span className="text-md text-gray-500 text-shadow">
+        <b>Today - </b> {new Date().toLocaleDateString()}
+      </span>
+
+      {/* Card */}
       <div className="card bg-base-100 shadow-xl ring-2 ring-base-300">
         <div className="card-body">
           <div className="overflow-x-auto">
@@ -384,7 +396,7 @@ const Stock = ({ isAdmin, session }) => {
       <input
         type="checkbox"
         id="edit-item-modal"
-        className="modal-toggle"
+        className="modal-toggle "
         checked={isEditModalOpen}
         onChange={() => setIsEditModalOpen(!isEditModalOpen)}
       />
@@ -415,14 +427,44 @@ const Stock = ({ isAdmin, session }) => {
                 <label className="label">
                   <span className="label-text">Quantity</span>
                 </label>
-                <input
-                  type="number"
-                  name="quantity"
-                  value={editItem.quantity}
-                  onChange={handleEditInputChange}
-                  className="input input-bordered"
-                  required
-                />
+                <div className="flex items-center gap-2 ">
+                  <input
+                    type="number"
+                    name="quantity"
+                    value={editItem.quantity}
+                    onChange={handleEditInputChange}
+                    className="input input-bordered w-full "
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-outline btn-square btn-md "
+                    onClick={() =>
+                      handleEditInputChange({
+                        target: {
+                          name: "quantity",
+                          value: Math.max(0, parseInt(editItem.quantity) - 1),
+                        },
+                      })
+                    }
+                  >
+                    <Minus size={18} />
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-outline btn-square btn-md"
+                    onClick={() =>
+                      handleEditInputChange({
+                        target: {
+                          name: "quantity",
+                          value: parseInt(editItem.quantity) + 1,
+                        },
+                      })
+                    }
+                  >
+                    <Plus size={18} />
+                  </button>
+                </div>
               </div>
               <div className="form-control">
                 <label className="label">

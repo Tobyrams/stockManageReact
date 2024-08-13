@@ -11,5 +11,5 @@ export default {
   daisyui: {
     themes: ["lofi", "light", "nord", "dark", "business", "dim", "black"],
   },
-  plugins: [require("daisyui")],
+  plugins: [require("daisyui"),require('tailwindcss-textshadow')],
 };

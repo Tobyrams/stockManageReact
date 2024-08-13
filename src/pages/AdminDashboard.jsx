@@ -168,7 +168,7 @@ function AdminDashboard({ session }) {
       <Toaster />
       <div className="card bg-base-100 shadow-xl ring-2 ring-base-300 ">
         <div className="card-body">
-          <h1 className="card-title text-2xl font-bold mb-4">Profiles</h1>
+          <h1 className="card-title text-2xl font-bold mb-4 text-shadow">Profiles</h1>
 
           {/* Profiles table */}
           {loading ? (

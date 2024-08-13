@@ -76,7 +76,7 @@ function Ingredients({ isAdmin, session }) {
 
   return (
     <div className="p-5 sm:p-10 font-poppins animate__animated animate__fadeIn ">
-      <h2 className="text-lg sm:text-lg md:text-xl lg:text-2xl mb-4 font-medium opacity-60">
+      <h2 className="text-lg sm:text-lg md:text-xl lg:text-2xl mb-4 font-medium opacity-60 text-shadow">
         Ingredients in each batch
       </h2>
 
@@ -97,20 +97,22 @@ function Ingredients({ isAdmin, session }) {
           </button>
         )}
       </div>
+
+      {/* Card */}
       <div className="card bg-base-100 shadow-xl ring-2 ring-base-300">
         <div className="card-body">
           <div className="overflow-x-auto">
             <table className="table w-full table-zebra">
               <thead>
                 <tr>
-                  <th className="text-sm sm:text-base md:text-lg lg:text-xl">
+                  <th className="text-sm sm:text-base md:text-lg lg:text-xl text-shadow">
                     Product
                   </th>
-                  <th className=" text-sm sm:text-base md:text-lg lg:text-xl">
+                  <th className=" text-sm sm:text-base md:text-lg lg:text-xl text-shadow">
                     Ingredients
                   </th>
                   {isAdmin && (
-                    <th className="text-sm sm:text-base md:text-lg lg:text-xl">
+                    <th className="text-sm sm:text-base md:text-lg lg:text-xl text-shadow">
                       Actions
                     </th>
                   )}

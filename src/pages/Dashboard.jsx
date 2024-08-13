@@ -24,15 +24,17 @@ function Dashboard() {
 
   return (
     <div className="p-5 sm:p-10 animate__animated animate__fadeIn">
-      <BackgroundTexture />
+      {/* <BackgroundTexture /> */}
       <DrawerComponent />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div className="mt-8 bg-base-100 shadow-lg rounded-lg overflow-hidden ring-2  ring-base-300 ring-offset-1 ring-offset-base-300">
           {/* Header section with title and current date */}
           <div className="p-4 bg-base-100 flex items-center">
-            <h2 className="text-2xl font-bold pr-5">Expiry Tracking</h2>
-            <span className="text-md text-gray-500">
+            <h2 className="text-2xl font-bold pr-5 text-shadow-sm">
+              Expiry Tracking
+            </h2>
+            <span className="text-md text-gray-500 text-shadow">
               <b>Today - </b> {new Date().toLocaleDateString()}
             </span>
           </div>
@@ -88,9 +90,11 @@ function Dashboard() {
         {/* New Low Stock Items card */}
         <div className="mt-8 bg-base-100 shadow-lg rounded-lg overflow-hidden ring-2 ring-base-300 ring-offset-1 ring-offset-base-300">
           <div className="p-4 bg-base-100 flex items-center justify-between ">
-            <h2 className="text-2xl font-bold pr-5">Low Stock Items</h2>
+            <h2 className="text-2xl font-bold pr-5 text-shadow-sm">
+              Low Stock Items
+            </h2>
             <button
-              className="btn btn-sm btn-outline"
+              className="btn btn-sm btn-outline text-shadow"
               onClick={handleViewAllClick}
             >
               View All

@@ -88,7 +88,7 @@ function Header({ isAdmin, session }) {
   return (
     <>
       {/* Navbar */}
-      <nav className="navbar shadow-md bg-base-100 font-poppins relative z-10 ring-2 ring-base-300">
+      <nav className="navbar shadow-md bg-base-100 font-poppins relative  ring-2 ring-base-300">
         {/* Sidebar Component */}
         <div className="flex-none">
           <SideBarComponent isAdmin={isAdmin} />
@@ -96,7 +96,7 @@ function Header({ isAdmin, session }) {
 
         {/* Header Title */}
         <div className="flex justify-center text-center w-full items-center">
-          <span className="text-2xl md:text-3xl lg:text-4xl font-semibold pl-2 ">
+          <span className="text-2xl md:text-3xl lg:text-4xl font-semibold pl-2 text-shadow-sm">
             {getPageTitle()}
           </span>
         </div>
