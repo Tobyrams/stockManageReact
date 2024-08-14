@@ -148,7 +148,41 @@ const Settings = () => {
   const deleteCategory = async (id) => {
     const { error } = await supabase.from("categories").delete().eq("id", id);
     if (error) {
-      toast.error("Failed to delete category");
+      toast.custom(
+        (t) => (
+          <div
+            className={`${
+              t.visible ? "animate-enter" : "animate-leave"
+            } max-w-md w-full bg-base-100 shadow-xl ring-1 ring-base-300 ring-offset-2 ring-offset-base-300 rounded-lg pointer-events-auto flex`}
+          >
+            <div className="flex-1 w-0 p-4">
+              <div className="flex items-start">
+                <div className="ml-3 flex-1">
+                  <p className="text-sm font-semibold text-base-content">
+                    Error Deleting Category
+                  </p>
+                  <p className="mt-1 text-sm text-base-content/70">
+                    Please make sure there are no stock items that contain this
+                    category.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex border-l border-base-300">
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-semibold text-error hover:text-error-focus focus:outline-none focus:ring-2 focus:ring-error"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        ),
+        {
+          duration: Infinity,
+          onClose: () => toast.dismiss(),
+        }
+      );
     } else {
       toast.success("Category deleted ", {
         duration: 3000,
@@ -252,7 +286,7 @@ const Settings = () => {
           </div>
 
           {/* Category selection dropdown */}
-          <div className="form-control mb-4">
+          {/* <div className="form-control mb-4">
             <label className="label">
               <span className="label-text">Select a category:</span>
             </label>
@@ -266,7 +300,7 @@ const Settings = () => {
                 </option>
               ))}
             </select>
-          </div>
+          </div> */}
 
           {/* Add new category */}
           <div className="flex mb-4">

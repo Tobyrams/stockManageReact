@@ -69,7 +69,7 @@ function Dashboard() {
                           calculateStatus(item.expiry) === "Expired"
                             ? "text-red-500"
                             : calculateStatus(item.expiry) <= 3
-                            ? "text-yellow-500"
+                            ? "text-orange-500"
                             : ""
                         }`}
                       >

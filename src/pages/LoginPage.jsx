@@ -30,7 +30,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center">
+    <div className="min-h-screen flex flex-col items-center justify-center px-5">
       <h2 className="text-4xl font-bold text-center mb-2">Login</h2>
       <p className="text-center font-medium text-sm text-base-content/70 mb-4">
         Enter your login information

@@ -11,12 +11,20 @@ import {
 } from "lucide-react";
 import { supabase } from "../supabaseClient";
 import { useStockSubscription_StockPG } from "../hooks/useStockSubscription";
+import { useCategorySubscription } from "../hooks/useCategorySubscription";
 
 const Stock = ({ isAdmin, session }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState("name");
   const [sortOrder, setSortOrder] = useState("asc");
   const { stocks, isLoading } = useStockSubscription_StockPG();
+  const { categories } = useCategorySubscription();
+  const [categorySearchTerm, setCategorySearchTerm] = useState("");
+
+  const getCategoryName = (categoryId) => {
+    const category = categories.find((cat) => cat.id === categoryId);
+    return category ? category.name : "Unknown";
+  };
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newItem, setNewItem] = useState({
@@ -24,23 +32,31 @@ const Stock = ({ isAdmin, session }) => {
     quantity: "",
     unit: "",
     expiry: "",
+    category_id: "",
   });
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editItem, setEditItem] = useState(null);
 
   const [deleteConfirmation, setDeleteConfirmation] = useState(null);
-  const [progress, setProgress] = useState(100);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [deleteTimer, setDeleteTimer] = useState(null);
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
   };
 
-  const filteredStocks = stocks.filter((stock) =>
-    stock.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleCategorySearch = (e) => {
+    setCategorySearchTerm(e.target.value.toLowerCase());
+  };
+
+  const filteredStocks = stocks.filter((stock) => {
+    const matchesName = stock.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const category = categories.find((cat) => cat.id === stock.category_id);
+    const matchesCategory =
+      category && category.name.toLowerCase().includes(categorySearchTerm);
+    return matchesName && matchesCategory;
+  });
 
   const handleAddNew = () => {
     setIsModalOpen(true);
@@ -49,7 +65,13 @@ const Stock = ({ isAdmin, session }) => {
   const handleModalClose = (e) => {
     e.preventDefault();
     setIsModalOpen(false);
-    setNewItem({ name: "", quantity: "", unit: "", expiry: "" });
+    setNewItem({
+      name: "",
+      quantity: "",
+      unit: "",
+      expiry: "",
+      category_id: "",
+    });
   };
 
   const handleInputChange = (e) => {
@@ -65,7 +87,14 @@ const Stock = ({ isAdmin, session }) => {
       toast.error("Error adding new item");
     } else {
       toast.success("New item added!");
-      handleModalClose();
+      setIsModalOpen(false); // Close the modal
+      setNewItem({
+        name: "",
+        quantity: "",
+        unit: "",
+        expiry: "",
+        category_id: "",
+      });
     }
   };
 
@@ -101,39 +130,16 @@ const Stock = ({ isAdmin, session }) => {
 
   const handleDelete = (id, name) => {
     setDeleteConfirmation({ id, name });
-    setProgress(100);
-    setIsModalVisible(true);
-    startDeleteTimer();
-  };
-
-  const startDeleteTimer = () => {
-    const timer = setInterval(() => {
-      setProgress((prevProgress) => {
-        if (prevProgress <= 0) {
-          clearInterval(timer);
-          confirmDelete();
-          return 0;
-        }
-        return prevProgress - 1;
-      });
-    }, 30);
-    setDeleteTimer(timer);
   };
 
   const cancelDelete = () => {
-    setIsModalVisible(false);
-    clearInterval(deleteTimer);
     setDeleteConfirmation(null);
-    setProgress(100);
   };
 
   const confirmDelete = async () => {
     if (deleteConfirmation) {
-      setIsModalVisible(false);
-      clearInterval(deleteTimer);
       await deleteStock(deleteConfirmation.id);
       setDeleteConfirmation(null);
-      setProgress(100);
     }
   };
 
@@ -154,8 +160,16 @@ const Stock = ({ isAdmin, session }) => {
   };
 
   const sortedStocks = [...filteredStocks].sort((a, b) => {
-    if (a[sortField] < b[sortField]) return sortOrder === "asc" ? -1 : 1;
-    if (a[sortField] > b[sortField]) return sortOrder === "asc" ? 1 : -1;
+    const aValue =
+      sortField === "category_id"
+        ? getCategoryName(a.category_id)
+        : a[sortField];
+    const bValue =
+      sortField === "category_id"
+        ? getCategoryName(b.category_id)
+        : b[sortField];
+    if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
+    if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
     return 0;
   });
 
@@ -165,8 +179,6 @@ const Stock = ({ isAdmin, session }) => {
         Overview of current stock
       </h2>
 
-      {/* Search, sort, add new item */}
-      {/* <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-6 xl:grid-cols-10 gap-2 mb-4"> */}
       <div className="flex flex-wrap gap-2 mb-4">
         <input
           type="text"
@@ -186,7 +198,16 @@ const Stock = ({ isAdmin, session }) => {
           <option value="quantity-desc">Quantity (High to Low)</option>
           <option value="expiry-asc">Expiry (Earliest First)</option>
           <option value="expiry-desc">Expiry (Latest First)</option>
+          <option value="category_id-asc">Category (A-Z)</option>
+          <option value="category_id-desc">Category (Z-A)</option>
         </select>
+        <input
+          type="text"
+          placeholder="Search categories..."
+          className="input input-bordered w-full max-w-[200px] mr-1"
+          value={categorySearchTerm}
+          onChange={handleCategorySearch}
+        />
 
         {isAdmin && (
           <button className="btn btn-primary" onClick={handleAddNew}>
@@ -200,7 +221,6 @@ const Stock = ({ isAdmin, session }) => {
         {new Date().toLocaleDateString()}
       </p>
 
-      {/* Card */}
       <div className="card bg-base-100 shadow-xl ring-2 ring-base-300">
         <div className="card-body">
           <div className="overflow-x-auto">
@@ -242,6 +262,16 @@ const Stock = ({ isAdmin, session }) => {
                     {sortField === "expiry" &&
                       (sortOrder === "asc" ? <ChevronUp /> : <ChevronDown />)}
                   </th>
+                  <th
+                    className="items-center text-xs sm:text-sm md:text-base lg:text-lg cursor-pointer"
+                    onClick={() =>
+                      handleSortChange({ target: { value: "category_id-asc" } })
+                    }
+                  >
+                    Category
+                    {sortField === "category_id" &&
+                      (sortOrder === "asc" ? <ChevronUp /> : <ChevronDown />)}
+                  </th>
                   {isAdmin && (
                     <th className="text-xs sm:text-sm md:text-base lg:text-lg">
                       Actions
@@ -251,12 +281,10 @@ const Stock = ({ isAdmin, session }) => {
               </thead>
               <tbody>
                 {isLoading
-                  ? // If loading, render skeleton rows
-                    Array(5)
+                  ? Array(5)
                       .fill()
                       .map((_, index) => (
                         <tr key={index}>
-                          {/* Skeleton cells for each column */}
                           <td>
                             <div className="h-4 bg-gray-300 rounded animate-pulse"></div>
                           </td>
@@ -269,7 +297,9 @@ const Stock = ({ isAdmin, session }) => {
                           <td>
                             <div className="h-4 bg-gray-300 rounded animate-pulse"></div>
                           </td>
-                          {/* Conditional rendering for admin actions column */}
+                          <td>
+                            <div className="h-4 bg-gray-300 rounded animate-pulse"></div>
+                          </td>
                           {isAdmin && (
                             <td>
                               <div className="h-4 bg-gray-300 rounded animate-pulse"></div>
@@ -277,13 +307,13 @@ const Stock = ({ isAdmin, session }) => {
                           )}
                         </tr>
                       ))
-                  : // If not loading, render actual stock data
-                    sortedStocks.map((stock) => (
+                  : sortedStocks.map((stock) => (
                       <tr key={stock.id}>
                         <td>{stock.name}</td>
                         <td>{stock.quantity}</td>
                         <td>{stock.unit}</td>
                         <td>{stock.expiry}</td>
+                        <td>{getCategoryName(stock.category_id)}</td>
                         {isAdmin && (
                           <td>
                             <Tooltip
@@ -400,6 +430,25 @@ const Stock = ({ isAdmin, session }) => {
                 className="input input-bordered"
                 required
               />
+            </div>
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Category</span>
+              </label>
+              <select
+                name="category_id"
+                value={newItem.category_id}
+                onChange={handleInputChange}
+                className="select select-bordered"
+                required
+              >
+                <option value="">Select a category</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="modal-action">
               <button type="submit" className="btn btn-primary">
@@ -520,6 +569,25 @@ const Stock = ({ isAdmin, session }) => {
                   required
                 />
               </div>
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Category</span>
+                </label>
+                <select
+                  name="category_id"
+                  value={editItem.category_id}
+                  onChange={handleEditInputChange}
+                  className="select select-bordered"
+                  required
+                >
+                  <option value="">Select a category</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div className="modal-action">
                 <button type="submit" className="btn btn-primary">
                   Update
@@ -540,29 +608,23 @@ const Stock = ({ isAdmin, session }) => {
         </label>
       </div>
 
-      {/* Delete Confirmation Modal */}
-      <input
-        type="checkbox"
-        id="delete-confirmation-modal"
-        className="modal-toggle"
-        checked={isModalVisible}
-        onChange={() => {}}
-      />
-      <div className="modal modal-bottom sm:modal-middle">
-        <div className="modal-box">
-          <h3 className="font-bold text-lg">Confirm Deletion</h3>
-          {deleteConfirmation && (
-            <>
+      {/* Delete Item Modal */}
+      {deleteConfirmation && (
+        <>
+          <input
+            type="checkbox"
+            id="delete-confirmation-modal"
+            className="modal-toggle"
+            checked={!!deleteConfirmation}
+            onChange={() => setDeleteConfirmation(null)}
+          />
+          <div className="modal modal-bottom sm:modal-middle">
+            <div className="modal-box">
+              <h3 className="font-bold text-lg">Confirm Deletion</h3>
               <p className="py-4">
                 Are you sure you want to delete "
-                <b>{deleteConfirmation.name}</b>"?
+                <b>{deleteConfirmation?.name}</b>"?
               </p>
-              <div className="w-full bg-gray-300 rounded-full h-2.5 mb-4">
-                <div
-                  className="bg-error h-2.5 rounded-full transition-all duration-300 ease-linear"
-                  style={{ width: `${progress}%` }}
-                ></div>
-              </div>
               <div className="modal-action">
                 <button className="btn btn-ghost" onClick={cancelDelete}>
                   Cancel
@@ -571,13 +633,16 @@ const Stock = ({ isAdmin, session }) => {
                   Delete
                 </button>
               </div>
-            </>
-          )}
-        </div>
-        <label className="modal-backdrop" htmlFor="delete-confirmation-modal">
-          Close
-        </label>
-      </div>
+            </div>
+            <label
+              className="modal-backdrop"
+              htmlFor="delete-confirmation-modal"
+            >
+              Close
+            </label>
+          </div>
+        </>
+      )}
     </section>
   );
 };
