@@ -112,7 +112,7 @@ function Header({ isAdmin, session }) {
                 mount: { scale: 1, x: 0 },
                 unmount: { scale: 0, x: 25 },
               }}
-              className="hidden sm:flex ring-2 ring-base-300 bg-base-100 text-base-content"
+              className="hidden lg:flex ring-2 ring-base-300 bg-base-100 text-base-content"
             >
               <Button variant="text" size="sm" className="text-base-content">
                 <Ellipsis size={30} />

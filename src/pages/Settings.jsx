@@ -272,7 +272,7 @@ const Settings = ({ isAdmin, session }) => {
               <h2 className="card-title">Stock Categories</h2>
               <Tooltip
                 placement="bottom"
-                className="border ring-2 ring-base-300 bg-base-100 px-4 py-3 shadow-xl"
+                className="border ring-2 ring-base-300 bg-base-100 px-4 py-3 shadow-xl hidden lg:flex"
                 content={
                   <div className="w-80">
                     <Typography className="font-medium text-base-content">
@@ -367,7 +367,7 @@ const Settings = ({ isAdmin, session }) => {
                               mount: { scale: 1, y: 0 },
                               unmount: { scale: 0, y: 25 },
                             }}
-                            className="bg-base-100 text-base-content ring-2 ring-base-300 hidden sm:flex"
+                            className="bg-base-100 text-base-content ring-2 ring-base-300 hidden lg:flex"
                           >
                             <Button
                               className="btn btn-ghost btn-md mr-2 text-base-content"
@@ -384,7 +384,7 @@ const Settings = ({ isAdmin, session }) => {
                               mount: { scale: 1, y: 0 },
                               unmount: { scale: 0, y: 25 },
                             }}
-                            className="bg-base-100 text-base-content ring-2 ring-base-300 hidden sm:flex"
+                            className="bg-base-100 text-base-content ring-2 ring-base-300 hidden lg:flex"
                           >
                             <Button
                               className="btn btn-ghost btn-md text-error"

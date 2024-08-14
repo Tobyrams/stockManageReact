@@ -182,7 +182,8 @@ const Stock = ({ isAdmin, session }) => {
         Overview of current stock
       </h2>
 
-      <div className="flex flex-wrap gap-2 mb-4">
+      {/* <div className="flex flex-wrap gap-2 mb-4"> */}
+      <div className="grid grid-cols-2  sm:flex  gap-2 mb-2">
         <input
           type="text"
           placeholder="Search stocks..."
@@ -213,7 +214,7 @@ const Stock = ({ isAdmin, session }) => {
         />
 
         {isAdmin && (
-          <button className="btn btn-primary" onClick={handleAddNew}>
+          <button className="btn btn-primary w-full max-w-[200px]" onClick={handleAddNew}>
             Add New Item
           </button>
         )}
@@ -326,7 +327,7 @@ const Stock = ({ isAdmin, session }) => {
                                 mount: { scale: 1, y: 0 },
                                 unmount: { scale: 0, y: 25 },
                               }}
-                              className="bg-base-100 text-base-content ring-2 ring-base-300 hidden sm:flex"
+                              className="bg-base-100 text-base-content ring-2 ring-base-300 hidden lg:flex"
                             >
                               <Button
                                 className="btn btn-md btn-ghost mr-2 text-base-content"
@@ -343,7 +344,7 @@ const Stock = ({ isAdmin, session }) => {
                                 mount: { scale: 1, y: 0 },
                                 unmount: { scale: 0, y: 25 },
                               }}
-                              className="bg-base-100 text-base-content ring-2 ring-base-300 hidden sm:flex"
+                              className="bg-base-100 text-base-content ring-2 ring-base-300 hidden lg:flex"
                             >
                               <Button
                                 className="btn btn-md btn-ghost text-error"
