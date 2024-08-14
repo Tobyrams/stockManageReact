@@ -4,32 +4,33 @@ import toast from "react-hot-toast";
 import { Moon, Sun, Monitor, SunMoon } from "lucide-react";
 
 const ThemeToggle = () => {
+  // State to track the current theme and dropdown open state
   const [currentTheme, setCurrentTheme] = useState("system");
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
-    // Initialize theme-change
+    // Initialize theme-change library
     themeChange(false);
 
-    // Function to get system theme
+    // Helper function to get the system's current theme
     const getSystemTheme = () =>
       window.matchMedia("(prefers-color-scheme: dark)").matches
         ? "dark"
         : "light";
 
-    // Check localStorage for saved theme
+    // Load saved theme from localStorage or default to "system"
     const savedTheme = localStorage.getItem("theme") || "system";
     setCurrentTheme(savedTheme);
 
-    // Set initial theme
+    // Set initial theme based on saved preference or system theme
     if (savedTheme === "system") {
       document.documentElement.setAttribute("data-theme", getSystemTheme());
     } else {
       document.documentElement.setAttribute("data-theme", savedTheme);
     }
 
-    // Add event listener for theme change
+    // Observer to detect changes in the data-theme attribute
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.attributeName === "data-theme") {
@@ -43,7 +44,7 @@ const ThemeToggle = () => {
       attributeFilter: ["data-theme"],
     });
 
-    // Add event listener for system theme change
+    // Listen for system theme changes
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const handleSystemThemeChange = (e) => {
       if (currentTheme === "system") {
@@ -55,13 +56,14 @@ const ThemeToggle = () => {
     };
     mediaQuery.addListener(handleSystemThemeChange);
 
-    // Cleanup function
+    // Cleanup function to remove listeners and observers
     return () => {
       observer.disconnect();
       mediaQuery.removeListener(handleSystemThemeChange);
     };
   }, [currentTheme]);
 
+  // Function to set the theme and show a toast notification
   const setTheme = (theme) => {
     if (theme !== currentTheme) {
       if (theme === "system") {
@@ -77,6 +79,8 @@ const ThemeToggle = () => {
       setCurrentTheme(theme);
     }
     setIsOpen(false);
+
+    // Show toast notification for theme change
     toast(`${theme.charAt(0).toUpperCase() + theme.slice(1)} Mode`, {
       icon:
         theme === "dark" ? <Moon /> : theme === "light" ? <Sun /> : <Monitor />,
@@ -89,8 +93,10 @@ const ThemeToggle = () => {
     });
   };
 
+  // Toggle dropdown open/close state
   const toggleDropdown = () => setIsOpen(!isOpen);
 
+  // Effect to close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -107,17 +113,20 @@ const ThemeToggle = () => {
   return (
     <div ref={dropdownRef} onClick={toggleDropdown}>
       <div className="dropdown dropdown-left">
+        {/* Theme toggle button */}
         <div tabIndex={0} role="button" className="cursor-pointer">
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1  ">
             <SunMoon size={20} />
             Theme
           </div>
         </div>
+        {/* Dropdown menu for theme selection */}
         {isOpen && (
           <ul
             tabIndex={0}
             className="dropdown-content mr-8 ring-2 ring-base-300 menu bg-base-100 rounded-sm z-[1] w-32 p-2 shadow"
           >
+            {/* Light theme option */}
             <li>
               <button
                 className={`theme-controller ${
@@ -129,6 +138,7 @@ const ThemeToggle = () => {
                 Light
               </button>
             </li>
+            {/* Dark theme option */}
             <li>
               <button
                 className={`theme-controller ${
@@ -140,6 +150,7 @@ const ThemeToggle = () => {
                 Dark
               </button>
             </li>
+            {/* System theme option */}
             <li>
               <button
                 className={`theme-controller ${

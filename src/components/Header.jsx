@@ -105,7 +105,15 @@ function Header({ isAdmin, session }) {
         <div className="flex-none">
           <div className="dropdown dropdown-end">
             {/* Dropdown Btn */}
-            <Tooltip content="More" placement="left">
+            <Tooltip
+              content="More"
+              placement="left"
+              animate={{
+                mount: { scale: 1, x: 0 },
+                unmount: { scale: 0, x: 25 },
+              }}
+              className="hidden sm:flex ring-2 ring-base-300 bg-base-100 text-base-content"
+            >
               <Button variant="text" size="sm" className="text-base-content">
                 <Ellipsis size={30} />
               </Button>
@@ -123,15 +131,18 @@ function Header({ isAdmin, session }) {
                 <ThemeToggle />
               </li>
               <li>
-                <button onClick={() => navigate("/settings")} className="flex items-center gap-1">
+                <button
+                  onClick={() => navigate("/settings")}
+                  className="flex items-center gap-1"
+                >
                   <Settings size={20} />
                   Settings
                 </button>
               </li>
               <li>
                 <button onClick={handleLogout}>
-                <LogOut size={17} />
-                  Logout 
+                  <LogOut size={17} />
+                  Logout
                 </button>
               </li>
             </ul>

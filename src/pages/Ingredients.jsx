@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 import { Pencil, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
-
+import { Tooltip, Button } from "@material-tailwind/react";
 function Ingredients({ isAdmin, session }) {
   // State declarations
   const [ingredients, setIngredients] = useState([]);
@@ -88,11 +88,11 @@ function Ingredients({ isAdmin, session }) {
       </h2>
 
       {/* Search and Add New Ingredient section */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 mb-4">
+      <div className="flex  gap-2 mb-4">
         <input
           type="text"
           placeholder="Search ingredients..."
-          className="input input-bordered w-full max-w-xs mr-2"
+          className="input input-bordered  w-full max-w-[200px] mr-2"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
@@ -160,24 +160,46 @@ function Ingredients({ isAdmin, session }) {
                         </td>
                         {isAdmin && (
                           <td>
-                            <button
-                              className="btn btn-ghost btn-md mr-2"
-                              onClick={() => {
-                                setEditingIngredient(ingredient);
-                                setIsEditModalVisible(true);
+                            <Tooltip
+                              content="Edit"
+                              placement="top"
+                              animate={{
+                                mount: { scale: 1, y: 0 },
+                                unmount: { scale: 0, y: 25 },
                               }}
+                              className="bg-base-100 text-base-content ring-2 ring-base-300 hidden sm:flex"
                             >
-                              <Pencil size={18} />
-                            </button>
-                            <button
-                              className="btn btn-ghost btn-md text-error"
-                              onClick={() => {
-                                setDeletingIngredientId(ingredient.id);
-                                setIsDeleteModalVisible(true);
+                              <Button
+                                className="btn btn-ghost btn-md mr-2 text-base-content"
+                                onClick={() => {
+                                  setEditingIngredient(ingredient);
+                                  setIsEditModalVisible(true);
+                                }}
+                                variant="text"
+                              >
+                                <Pencil size={18} />
+                              </Button>
+                            </Tooltip>
+                            <Tooltip
+                              content="Delete"
+                              placement="top"
+                              animate={{
+                                mount: { scale: 1, y: 0 },
+                                unmount: { scale: 0, y: 25 },
                               }}
+                              className="bg-base-100 text-base-content ring-2 ring-base-300 hidden sm:flex"
                             >
-                              <Trash2 size={18} />
-                            </button>
+                              <Button
+                                className="btn btn-ghost btn-md text-error"
+                                onClick={() => {
+                                  setDeletingIngredientId(ingredient.id);
+                                  setIsDeleteModalVisible(true);
+                                }}
+                                variant="text"
+                              >
+                                <Trash2 size={18} />
+                              </Button>
+                            </Tooltip>
                           </td>
                         )}
                       </tr>
@@ -189,7 +211,10 @@ function Ingredients({ isAdmin, session }) {
       </div>
 
       {/* Add New Ingredient Modal */}
-      <dialog id="add_ingredient_modal" className="modal">
+      <dialog
+        id="add_ingredient_modal"
+        className="modal modal-bottom sm:modal-middle"
+      >
         <div className="modal-box">
           <h3 className="font-semibold text-2xl sm:text-3xl md:text-4xl text-center mb-4 text-shadow">
             Add New Ingredient

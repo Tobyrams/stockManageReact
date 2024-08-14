@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import { Tooltip, Button } from "@material-tailwind/react";
 import { toast } from "react-hot-toast";
 import {
   ChevronDown,
@@ -164,17 +164,19 @@ const Stock = ({ isAdmin, session }) => {
       <h2 className="text-lg sm:text-lg md:text-xl lg:text-2xl mb-4 font-medium opacity-60 text-shadow">
         Overview of current stock
       </h2>
-      {/* Action buttons */}
-      <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-6 xl:grid-cols-10 gap-2 mb-4">
+
+      {/* Search, sort, add new item */}
+      {/* <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-6 xl:grid-cols-10 gap-2 mb-4"> */}
+      <div className="flex flex-wrap gap-2 mb-4">
         <input
           type="text"
           placeholder="Search stocks..."
-          className="input input-bordered w-full max-w-xs mr-1"
+          className="input input-bordered w-full max-w-[200px] mr-1"
           value={searchTerm}
           onChange={handleSearch}
         />
         <select
-          className="select select-bordered mr-1"
+          className="select select-bordered w-full max-w-[200px] mr-1"
           value={`${sortField}-${sortOrder}`}
           onChange={handleSortChange}
         >
@@ -211,7 +213,7 @@ const Stock = ({ isAdmin, session }) => {
                       handleSortChange({ target: { value: "name-asc" } })
                     }
                   >
-                    Name{" "}
+                    Name
                     {sortField === "name" &&
                       (sortOrder === "asc" ? <ChevronUp /> : <ChevronDown />)}
                   </th>
@@ -222,7 +224,7 @@ const Stock = ({ isAdmin, session }) => {
                     }
                   >
                     <div className="flex items-center ">
-                      Quantity{" "}
+                      Quantity
                       {sortField === "quantity" &&
                         (sortOrder === "asc" ? <ChevronUp /> : <ChevronDown />)}
                     </div>
@@ -284,18 +286,42 @@ const Stock = ({ isAdmin, session }) => {
                         <td>{stock.expiry}</td>
                         {isAdmin && (
                           <td>
-                            <button
-                              className="btn btn-md btn-ghost mr-2"
-                              onClick={() => handleEdit(stock)}
+                            <Tooltip
+                              content="Edit"
+                              placement="top"
+                              animate={{
+                                mount: { scale: 1, y: 0 },
+                                unmount: { scale: 0, y: 25 },
+                              }}
+                              className="bg-base-100 text-base-content ring-2 ring-base-300 hidden sm:flex"
                             >
-                              <Pencil size={18} />
-                            </button>
-                            <button
-                              className="btn btn-md btn-ghost text-error"
-                              onClick={() => handleDelete(stock.id, stock.name)}
+                              <Button
+                                className="btn btn-md btn-ghost mr-2 text-base-content"
+                                onClick={() => handleEdit(stock)}
+                                variant="text"
+                              >
+                                <Pencil size={18} />
+                              </Button>
+                            </Tooltip>
+                            <Tooltip
+                              content="Delete"
+                              placement="top"
+                              animate={{
+                                mount: { scale: 1, y: 0 },
+                                unmount: { scale: 0, y: 25 },
+                              }}
+                              className="bg-base-100 text-base-content ring-2 ring-base-300 hidden sm:flex"
                             >
-                              <Trash2 size={18} />
-                            </button>
+                              <Button
+                                className="btn btn-md btn-ghost text-error"
+                                onClick={() =>
+                                  handleDelete(stock.id, stock.name)
+                                }
+                                variant="text"
+                              >
+                                <Trash2 size={18} />
+                              </Button>
+                            </Tooltip>
                           </td>
                         )}
                       </tr>
