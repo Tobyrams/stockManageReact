@@ -5,9 +5,15 @@ import { Moon, Sun, Monitor, Plus, Trash, Edit2, Info } from "lucide-react";
 import { Tooltip, Button, Typography } from "@material-tailwind/react";
 import { supabase } from "../supabaseClient"; // Ensure this import is correct
 
-const Settings = () => {
+const Settings = ({ isAdmin, session }) => {
   // State to keep track of the current theme
   const [currentTheme, setCurrentTheme] = useState("system");
+  // State to keep track of the new category
+  const [newCategory, setNewCategory] = useState("");
+  // State to keep track of the category being edited
+  const [editingCategory, setEditingCategory] = useState(null);
+  // State to track loading for categories
+  const [loading, setLoading] = useState(true);
 
   // Arrays of available light and dark themes
   const lightThemes = ["lofi", "nord", "light"];
@@ -105,25 +111,23 @@ const Settings = () => {
   }, []);
 
   const fetchCategories = async () => {
+    setLoading(true);
     const { data, error } = await supabase
       .from("categories")
       .select("*")
       .order("name");
     if (error) {
-      // console.error("Error fetching categories:", error);
       toast.error("Error fetching categories");
     } else {
       setCategories(data);
     }
+    setLoading(false);
   };
 
   const handleCategoriesChange = (payload) => {
     // console.log("Change received!", payload);
     fetchCategories(); // Refetch all categories
   };
-
-  const [newCategory, setNewCategory] = useState("");
-  const [editingCategory, setEditingCategory] = useState(null);
 
   const addCategory = async () => {
     if (newCategory.trim()) {
@@ -146,13 +150,16 @@ const Settings = () => {
   };
 
   const deleteCategory = async (id) => {
+    const categoryToDelete = categories.find((cat) => cat.id === id);
     const { error } = await supabase.from("categories").delete().eq("id", id);
     if (error) {
       toast.custom(
         (t) => (
           <div
             className={`${
-              t.visible ? "animate-enter" : "animate-leave"
+              t.visible
+                ? "animate__animated animate__bounceInDown animate__fast"
+                : "animate__animated animate__bounceOutUp animate__fast"
             } max-w-md w-full bg-base-100 shadow-xl ring-1 ring-base-300 ring-offset-2 ring-offset-base-300 rounded-lg pointer-events-auto flex`}
           >
             <div className="flex-1 w-0 p-4">
@@ -162,8 +169,8 @@ const Settings = () => {
                     Error Deleting Category
                   </p>
                   <p className="mt-1 text-sm text-base-content/70">
-                    Please make sure there are no stock items that contain this
-                    category.
+                    Please make sure there are no stock items that contain the
+                    category "{categoryToDelete?.name}".
                   </p>
                 </div>
               </div>
@@ -179,7 +186,7 @@ const Settings = () => {
           </div>
         ),
         {
-          duration: Infinity,
+          duration: 5000,
           onClose: () => toast.dismiss(),
         }
       );
@@ -220,7 +227,7 @@ const Settings = () => {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 animate__animated animate__fadeIn">
       <div className="card bg-base-100 shadow-xl ring-2 ring-base-300 ring-offset-2 ring-offset-base-300 mb-4">
         <div className="card-body">
           <h2 className="card-title">Theme Settings</h2>
@@ -257,142 +264,146 @@ const Settings = () => {
       </div>
 
       {/* Categories */}
-      <div className="card bg-base-100 shadow-xl ring-2 ring-base-300 ring-offset-2 ring-offset-base-300">
-        <div className="card-body">
-          {/* Stock Categories Heading */}
-          <div className="flex items-center gap-2">
-            <h2 className="card-title">Stock Categories</h2>
-            <Tooltip
-              placement="bottom"
-              className="border ring-2 ring-base-300 bg-base-100 px-4 py-3 shadow-xl"
-              content={
-                <div className="w-80">
-                  <Typography className="font-medium text-base-content">
-                    Stock Categories
-                  </Typography>
-                  <Typography
-                    variant="small"
-                    color="blue-gray"
-                    className="font-normal opacity-80 text-base-content"
-                  >
-                    Stock Categories is the list of categories for the stock
-                    items on the Stock page.
-                  </Typography>
-                </div>
-              }
-            >
-              <Info size={20} className="cursor-pointer" />
-            </Tooltip>
-          </div>
-
-          {/* Category selection dropdown */}
-          {/* <div className="form-control mb-4">
-            <label className="label">
-              <span className="label-text">Select a category:</span>
-            </label>
-            <select className="select select-bordered w-full max-w-xs">
-              <option disabled selected>
-                Choose a category
-              </option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </div> */}
-
-          {/* Add new category */}
-          <div className="flex mb-4">
-            <input
-              type="text"
-              placeholder="New category name"
-              className="input input-bordered flex-grow mr-2"
-              value={newCategory}
-              onChange={(e) => setNewCategory(e.target.value)}
-            />
-            <button className="btn btn-primary" onClick={addCategory}>
-              <Plus size={20} />
-              Add
-            </button>
-          </div>
-
-          {/* Categories list */}
-          <ul className="space-y-2">
-            {categories.map((category) => (
-              <li
-                key={category.id}
-                className="flex items-center justify-between hover:bg-base-200/30"
-              >
-                {editingCategory && editingCategory.id === category.id ? (
-                  <>
-                    <input
-                      type="text"
-                      className="input input-bordered w-full mr-2"
-                      value={editingCategory.name}
-                      onChange={(e) =>
-                        setEditingCategory({
-                          ...editingCategory,
-                          name: e.target.value,
-                        })
-                      }
-                    />
-                    <button className="btn btn-success mr-2" onClick={saveEdit}>
-                      Save
-                    </button>
-                    <button
-                      className="btn btn-ghost"
-                      onClick={() => setEditingCategory(null)}
+      {isAdmin && (
+        <div className="card bg-base-100 shadow-xl ring-2 ring-base-300 ring-offset-2 ring-offset-base-300">
+          <div className="card-body">
+            {/* Stock Categories Heading */}
+            <div className="flex items-center gap-2">
+              <h2 className="card-title">Stock Categories</h2>
+              <Tooltip
+                placement="bottom"
+                className="border ring-2 ring-base-300 bg-base-100 px-4 py-3 shadow-xl"
+                content={
+                  <div className="w-80">
+                    <Typography className="font-medium text-base-content">
+                      Stock Categories
+                    </Typography>
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="font-normal opacity-80 text-base-content"
                     >
-                      Cancel
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <span>{category.name}</span>
-                    <div>
-                      <Tooltip
-                        content="Edit"
-                        placement="top"
-                        animate={{
-                          mount: { scale: 1, y: 0 },
-                          unmount: { scale: 0, y: 25 },
-                        }}
-                        className="bg-base-100 text-base-content ring-2 ring-base-300 hidden sm:flex"
-                      >
-                        <Button
-                          className="btn btn-ghost btn-md mr-2 text-base-content"
-                          variant="text"
-                          onClick={() => startEditing(category)}
-                        >
-                          <Edit2 size={16} />
-                        </Button>
-                      </Tooltip>
-                      <Tooltip
-                        content="Delete"
-                        placement="top"
-                        animate={{
-                          mount: { scale: 1, y: 0 },
-                          unmount: { scale: 0, y: 25 },
-                        }}
-                        className="bg-base-100 text-base-content ring-2 ring-base-300 hidden sm:flex"
-                      >
-                        <Button
-                          className="btn btn-ghost btn-md text-error"
-                          variant="text"
-                          onClick={() => deleteCategory(category.id)}
-                        >
-                          <Trash size={16} />
-                        </Button>
-                      </Tooltip>
+                      Stock Categories is the list of categories for the stock
+                      items on the Stock page.
+                    </Typography>
+                  </div>
+                }
+              >
+                <Info size={20} className="cursor-pointer" />
+              </Tooltip>
+            </div>
+
+            {/* Add new category */}
+            <div className="flex mb-4">
+              <input
+                type="text"
+                placeholder="New category name"
+                className="input input-bordered w-full  mr-2"
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+              />
+              <button className="btn btn-primary" onClick={addCategory}>
+                <Plus size={20} />
+                Add
+              </button>
+            </div>
+
+            {/* Categories list with loading skeleton */}
+            {loading ? (
+              // Loading skeleton
+              <ul className="space-y-2">
+                {[...Array(5)].map((_, index) => (
+                  <li key={index} className="flex items-center justify-between">
+                    <div className="skeleton h-4 w-3/4"></div>
+                    <div className="flex">
+                      <div className="skeleton h-8 w-8 mr-2"></div>
+                      <div className="skeleton h-8 w-8"></div>
                     </div>
-                  </>
-                )}
-              </li>
-            ))}
-          </ul>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              // Categories list
+              <ul className="space-y-2">
+                {categories.map((category) => (
+                  <li
+                    key={category.id}
+                    className="flex w-full items-center text-sm sm:text-lg font-medium  justify-between hover:bg-base-200/30"
+                  >
+                    {editingCategory && editingCategory.id === category.id ? (
+                      <>
+                        <input
+                          type="text"
+                          className="input input-bordered w-full mr-2"
+                          value={editingCategory.name}
+                          onChange={(e) =>
+                            setEditingCategory({
+                              ...editingCategory,
+                              name: e.target.value,
+                            })
+                          }
+                        />
+                        <button
+                          className="btn btn-success mr-2"
+                          onClick={saveEdit}
+                        >
+                          Save
+                        </button>
+                        <button
+                          className="btn btn-ghost"
+                          onClick={() => setEditingCategory(null)}
+                        >
+                          Cancel
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <span>{category.name}</span>
+                        <div>
+                          <Tooltip
+                            content="Edit"
+                            placement="top"
+                            animate={{
+                              mount: { scale: 1, y: 0 },
+                              unmount: { scale: 0, y: 25 },
+                            }}
+                            className="bg-base-100 text-base-content ring-2 ring-base-300 hidden sm:flex"
+                          >
+                            <Button
+                              className="btn btn-ghost btn-md mr-2 text-base-content"
+                              variant="text"
+                              onClick={() => startEditing(category)}
+                            >
+                              <Edit2 size={16} />
+                            </Button>
+                          </Tooltip>
+                          <Tooltip
+                            content="Delete"
+                            placement="top"
+                            animate={{
+                              mount: { scale: 1, y: 0 },
+                              unmount: { scale: 0, y: 25 },
+                            }}
+                            className="bg-base-100 text-base-content ring-2 ring-base-300 hidden sm:flex"
+                          >
+                            <Button
+                              className="btn btn-ghost btn-md text-error"
+                              variant="text"
+                              onClick={() => deleteCategory(category.id)}
+                            >
+                              <Trash size={16} />
+                            </Button>
+                          </Tooltip>
+                        </div>
+                      </>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

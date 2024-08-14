@@ -9,11 +9,12 @@ import {
   LogOut,
   Menu,
   PackageSearch,
+  Settings,
   ShieldCheck,
   ShoppingBasket,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
-
+import logo from "../assets/Tadinda_new_logo_transparent.png";
 
 // Main sidebar component
 function SideBarComponent({ isAdmin, session }) {
@@ -54,7 +55,7 @@ function SideBarComponent({ isAdmin, session }) {
 
   const handleLogout = async () => {
     toast.success("Logged out");
-    handleNavLinkClick("/")
+    handleNavLinkClick("/");
   };
 
   return (
@@ -78,7 +79,12 @@ function SideBarComponent({ isAdmin, session }) {
           ></label>
           <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4 ">
             {/* Sidebar content here */}
-            <h1 className="text-2xl font-medium py-2 border-b-2">Tadinda.</h1>
+            <div className="flex items-center justify-center gap-4">
+              <img src={logo} alt="logo" className="object-cover w-40 h-40 " />
+              {/* <h1 className="text-2xl font-bold   pt-4 ">Tadinda.</h1> */}
+            </div>
+
+            <div className="divider"></div>
 
             <li className="pt-4">
               <button
@@ -89,19 +95,7 @@ function SideBarComponent({ isAdmin, session }) {
                 Dashboard
               </button>
             </li>
-            {isAdmin && (
-              <li>
-                <button
-                  onClick={() => handleNavLinkClick("/admin")}
-                  className={getButtonClass("/admin")}
-                >
-                  <>
-                    <ShieldCheck size={20} />
-                    Admin Dashboard
-                  </>
-                </button>
-              </li>
-            )}
+
             <li>
               <button
                 onClick={() => handleNavLinkClick("/stock")}
@@ -145,6 +139,33 @@ function SideBarComponent({ isAdmin, session }) {
               >
                 <HandCoins size={20} />
                 Finances
+              </button>
+            </li>
+
+            {/* Divider */}
+            <div className="divider"></div>
+
+            {isAdmin && (
+              <li>
+                <button
+                  onClick={() => handleNavLinkClick("/admin")}
+                  className={getButtonClass("/admin")}
+                >
+                  <>
+                    <ShieldCheck size={20} />
+                    Admin Dashboard
+                  </>
+                </button>
+              </li>
+            )}
+
+            <li>
+              <button
+                onClick={() => handleNavLinkClick("/settings")}
+                className={getButtonClass("/settings")}
+              >
+                <Settings size={20} />
+                Settings
               </button>
             </li>
 

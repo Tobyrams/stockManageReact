@@ -21,8 +21,11 @@ const Stock = ({ isAdmin, session }) => {
   const { categories } = useCategorySubscription();
   const [categorySearchTerm, setCategorySearchTerm] = useState("");
 
+  // Function to get the category name from a category ID
   const getCategoryName = (categoryId) => {
+    // Find the category object in the categories array that matches the given ID
     const category = categories.find((cat) => cat.id === categoryId);
+    // Return the category name if found, otherwise return "Unknown"
     return category ? category.name : "Unknown";
   };
 

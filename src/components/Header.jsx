@@ -70,7 +70,7 @@ function Header({ isAdmin, session }) {
         );
       case "/settings":
         return (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center ">
             <Settings size={30} /> Settings
           </div>
         );
@@ -130,7 +130,7 @@ function Header({ isAdmin, session }) {
               <li>
                 <ThemeToggle />
               </li>
-              <li>
+              {/* <li>
                 <button
                   onClick={() => navigate("/settings")}
                   className="flex items-center gap-1"
@@ -144,7 +144,7 @@ function Header({ isAdmin, session }) {
                   <LogOut size={17} />
                   Logout
                 </button>
-              </li>
+              </li> */}
             </ul>
           </div>
         </div>

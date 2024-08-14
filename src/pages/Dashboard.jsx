@@ -87,7 +87,7 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* New Low Stock Items card */}
+        {/*  Low Stock Items card */}
         <div className="mt-8 bg-base-100 shadow-lg rounded-lg overflow-hidden ring-2 ring-base-300 ring-offset-1 ring-offset-base-300">
           <div className="p-4 bg-base-100 flex items-center justify-between ">
             <h2 className="text-2xl font-bold pr-5 text-shadow-sm">
@@ -108,7 +108,7 @@ function Dashboard() {
                     Ingredient
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Amount
+                    Amount Remaining
                   </th>
                 </tr>
               </thead>
