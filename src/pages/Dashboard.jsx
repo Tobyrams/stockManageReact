@@ -3,18 +3,22 @@ import { DrawerComponent } from "../components";
 import { useNavigate } from "react-router-dom";
 import { BackgroundTexture } from "../components";
 import { useStockSubscription } from "../hooks/useStockSubscription";
+import { TrendingDown, TriangleAlert } from "lucide-react";
 
 function Dashboard() {
   const navigate = useNavigate();
   const { stockItems, lowStockItems } = useStockSubscription();
 
   const calculateStatus = (expiryDate) => {
+    if (!expiryDate) return "No date";
+    
     const today = new Date();
     const expiry = new Date(expiryDate);
     const diffTime = expiry - today;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     if (diffDays < 0) return "Expired";
+    
     return diffDays;
   };
 
@@ -31,9 +35,12 @@ function Dashboard() {
         <div className="mt-8 bg-base-100 shadow-lg rounded-lg overflow-hidden ring-2  ring-base-300 ring-offset-1 ring-offset-base-300">
           {/* Header section with title and current date */}
           <div className="p-4 bg-base-100 flex items-center">
-            <h2 className="text-2xl font-bold pr-5 text-shadow-sm">
-              Expiry Tracking
-            </h2>
+            <div className="flex items-center gap-2">
+              <TrendingDown size={25} className="text-red-500" />
+              <h2 className="text-2xl font-bold pr-5 text-shadow-sm ">
+                Expiry Tracking
+              </h2>
+            </div>
             <span className="text-md text-gray-500 text-shadow">
               <b>Today - </b> {new Date().toLocaleDateString()}
             </span>
@@ -60,7 +67,7 @@ function Dashboard() {
                   <tr key={index}>
                     <td className="px-6 py-4 whitespace-nowrap">{item.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {new Date(item.expiry).toLocaleDateString()}
+                      {item.expiry ? new Date(item.expiry).toLocaleDateString() : "N/A"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {/* Display status with appropriate color coding */}
@@ -68,13 +75,18 @@ function Dashboard() {
                         className={`badge badge-outline rounded-full ${
                           calculateStatus(item.expiry) === "Expired"
                             ? "text-red-500"
+                            : calculateStatus(item.expiry) === "No date"
+                            ? "text-gray-500"
                             : calculateStatus(item.expiry) <= 3
                             ? "text-orange-500"
                             : ""
                         }`}
                       >
+                        
                         {calculateStatus(item.expiry) === "Expired"
                           ? "Expired"
+                          : calculateStatus(item.expiry) === "No date"
+                          ? "No date"
                           : `${calculateStatus(item.expiry)} day${
                               calculateStatus(item.expiry) !== 1 ? "s" : ""
                             } left`}
@@ -90,9 +102,13 @@ function Dashboard() {
         {/*  Low Stock Items card */}
         <div className="mt-8 bg-base-100 shadow-lg rounded-lg overflow-hidden ring-2 ring-base-300 ring-offset-1 ring-offset-base-300">
           <div className="p-4 bg-base-100 flex items-center justify-between ">
-            <h2 className="text-2xl font-bold pr-5 text-shadow-sm">
-              Low Stock Items
-            </h2>
+            <div className="flex items-center gap-2">
+              <TriangleAlert size={25} className="text-orange-500" />
+              <h2 className="text-2xl font-bold pr-5 text-shadow-sm">
+                Low Stock Items
+              </h2>
+            </div>
+
             <button
               className="btn btn-sm btn-outline text-shadow"
               onClick={handleViewAllClick}

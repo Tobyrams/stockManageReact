@@ -228,6 +228,7 @@ function AdminDashboard({ session }) {
                         >
                           <option value={1}>User</option>
                           <option value={2}>Admin</option>
+                          <option value={3}>Chef</option>
                         </select>
                       </td>
                       <td>

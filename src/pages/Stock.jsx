@@ -214,7 +214,10 @@ const Stock = ({ isAdmin, session }) => {
         />
 
         {isAdmin && (
-          <button className="btn btn-primary w-full max-w-[200px]" onClick={handleAddNew}>
+          <button
+            className="btn btn-primary w-full max-w-[200px]"
+            onClick={handleAddNew}
+          >
             Add New Item
           </button>
         )}
@@ -272,9 +275,11 @@ const Stock = ({ isAdmin, session }) => {
                       handleSortChange({ target: { value: "category_id-asc" } })
                     }
                   >
-                    Category
-                    {sortField === "category_id" &&
-                      (sortOrder === "asc" ? <ChevronUp /> : <ChevronDown />)}
+                    <div className="flex items-center">
+                      Category
+                      {sortField === "category_id" &&
+                        (sortOrder === "asc" ? <ChevronUp /> : <ChevronDown />)}
+                    </div>
                   </th>
                   {isAdmin && (
                     <th className="text-xs sm:text-sm md:text-base lg:text-lg">
@@ -411,20 +416,19 @@ const Stock = ({ isAdmin, session }) => {
             </div>
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Unit of Measurement</span>
+                <span className="label-text">Unit of Measurement <span className="text-sm text-gray-500">(Optional)</span></span>
               </label>
               <input
                 type="text"
                 name="unit"
-                value={newItem.unit}
+                value={newItem.unit || "-"}
                 onChange={handleInputChange}
                 className="input input-bordered"
-                required
               />
             </div>
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Expiry Date</span>
+                <p className="label-text">Expiry Date <span className="text-sm text-gray-500">(Optional)</span></p>
               </label>
               <input
                 type="date"
@@ -432,7 +436,6 @@ const Stock = ({ isAdmin, session }) => {
                 value={newItem.expiry}
                 onChange={handleInputChange}
                 className="input input-bordered"
-                required
               />
             </div>
             <div className="form-control">
@@ -554,10 +557,10 @@ const Stock = ({ isAdmin, session }) => {
                 <input
                   type="text"
                   name="unit"
-                  value={editItem.unit}
+                  value={editItem.unit || "-"}
                   onChange={handleEditInputChange}
                   className="input input-bordered"
-                  required
+                  
                 />
               </div>
               <div className="form-control">
@@ -570,7 +573,7 @@ const Stock = ({ isAdmin, session }) => {
                   value={editItem.expiry}
                   onChange={handleEditInputChange}
                   className="input input-bordered"
-                  required
+                  
                 />
               </div>
               <div className="form-control">
