@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { supabase } from "../supabaseClient";
-import { Trash2 } from "lucide-react";
+import { Trash2, Info } from "lucide-react";
+import { Tooltip } from "@material-tailwind/react";
 
 function AdminDashboard({ session }) {
   // State variables
@@ -9,6 +10,7 @@ function AdminDashboard({ session }) {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [onlineUsers, setOnlineUsers] = useState({});
 
   // Delete confirmation state variables
   const [deleteConfirmation, setDeleteConfirmation] = useState(null);
@@ -23,8 +25,10 @@ function AdminDashboard({ session }) {
   useEffect(() => {
     if (isAdmin) {
       getProfiles();
-      const cleanupListener = setupRealtimeListener();
-      return () => cleanupListener();
+      const presenceChannel = setupPresenceChannel();
+      return () => {
+        presenceChannel.unsubscribe();
+      };
     }
   }, [isAdmin]);
 
@@ -52,39 +56,37 @@ function AdminDashboard({ session }) {
     setLoading(false);
   };
 
-  // Set up realtime listener for profile changes
-  const setupRealtimeListener = () => {
-    const channel = supabase
-      .channel("custom-all-channel")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "profiles" },
-        (payload) => {
-          handleRealtimeUpdate(payload);
+  // Set up presence channel for online users
+  const setupPresenceChannel = () => {
+    const channel = supabase.channel("online-users", {
+      config: {
+        presence: {
+          key: session.user.id,
+        },
+      },
+    });
+
+    channel
+      .on("presence", { event: "sync" }, () => {
+        const newState = channel.presenceState();
+        const onlineUsersMap = {};
+        Object.values(newState)
+          .flat()
+          .forEach((user) => {
+            onlineUsersMap[user.user_id] = true;
+          });
+        setOnlineUsers(onlineUsersMap);
+      })
+      .subscribe(async (status) => {
+        if (status === "SUBSCRIBED") {
+          await channel.track({
+            user_id: session.user.id,
+            email: session.user.email,
+          });
         }
-      )
-      .subscribe();
+      });
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  };
-
-  // Handle realtime updates
-  const handleRealtimeUpdate = (payload) => {
-    if (payload.eventType === "INSERT") {
-      setProfiles((prevProfiles) => [...prevProfiles, payload.new]);
-    } else if (payload.eventType === "UPDATE") {
-      setProfiles((prevProfiles) =>
-        prevProfiles.map((profile) =>
-          profile.id === payload.new.id ? payload.new : profile
-        )
-      );
-    } else if (payload.eventType === "DELETE") {
-      setProfiles((prevProfiles) =>
-        prevProfiles.filter((profile) => profile.id !== payload.old.id)
-      );
-    }
+    return channel;
   };
 
   // Fetch profiles from Supabase
@@ -166,9 +168,11 @@ function AdminDashboard({ session }) {
   return (
     <div className="p-5 sm:p-10 font-poppins animate__animated animate__fadeIn ">
       <Toaster />
-      <div className="card bg-base-100 shadow-xl ring-2 ring-base-300 ">
+      <div className="card bg-base-100 shadow-xl ring-2 ring-base-300 mb-8">
         <div className="card-body">
-          <h1 className="card-title text-2xl font-bold mb-4 text-shadow">Profiles</h1>
+          <h1 className="card-title text-2xl font-bold mb-4 text-shadow">
+            Profiles
+          </h1>
 
           {/* Profiles table */}
           {loading ? (
@@ -179,6 +183,18 @@ function AdminDashboard({ session }) {
                     <th>Email</th>
                     <th>Created At</th>
                     <th>Role</th>
+                    <th>
+                      Online
+                      <Tooltip
+                        content="Green: Online, Red: Offline"
+                        placement="right"
+                      >
+                        <Info
+                          size={16}
+                          className="inline-block ml-1 cursor-help"
+                        />
+                      </Tooltip>
+                    </th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -195,6 +211,9 @@ function AdminDashboard({ session }) {
                         <div className="h-8 bg-gray-200 rounded w-24 animate-pulse"></div>
                       </td>
                       <td>
+                        <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+                      </td>
+                      <td>
                         <div className="h-8 bg-gray-200 rounded w-16 animate-pulse"></div>
                       </td>
                     </tr>
@@ -206,10 +225,34 @@ function AdminDashboard({ session }) {
             <div className="overflow-x-auto">
               <table className="table table-zebra w-full">
                 <thead>
-                  <tr>
+                  <tr className="text-lg">
                     <th>Email</th>
                     <th>Created At</th>
                     <th>Role</th>
+                    <th className="flex items-center">
+                      Online
+                      <div className="">
+                        <Tooltip
+                          content={
+                            <>
+                              <span className="mr-2">Status:</span>
+                              <span className="inline-block w-3 h-3 rounded-full bg-green-500 mr-1"></span>
+                              <span className="text-green-500 mr-2">
+                                Online
+                              </span>
+                              <span className="inline-block w-3 h-3 rounded-full bg-red-500 mr-1"></span>
+                              <span className="text-red-500">Offline</span>
+                            </>
+                          }
+                          placement="right"
+                        >
+                          <Info
+                            size={16}
+                            className="inline-block ml-2 cursor-help"
+                          />
+                        </Tooltip>
+                      </div>
+                    </th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -230,6 +273,15 @@ function AdminDashboard({ session }) {
                           <option value={2}>Admin</option>
                           <option value={3}>Chef</option>
                         </select>
+                      </td>
+                      <td>
+                        <div
+                          className={`w-3 h-3 rounded-full ${
+                            onlineUsers[profile.id]
+                              ? "bg-green-500 animate-pulse"
+                              : "bg-red-500"
+                          }`}
+                        ></div>
                       </td>
                       <td>
                         {profile.role_id === 1 ? (
