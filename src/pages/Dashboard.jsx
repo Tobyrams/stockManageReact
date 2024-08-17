@@ -11,14 +11,14 @@ function Dashboard() {
 
   const calculateStatus = (expiryDate) => {
     if (!expiryDate) return "No date";
-    
+
     const today = new Date();
     const expiry = new Date(expiryDate);
     const diffTime = expiry - today;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     if (diffDays < 0) return "Expired";
-    
+
     return diffDays;
   };
 
@@ -67,22 +67,25 @@ function Dashboard() {
                   <tr key={index}>
                     <td className="px-6 py-4 whitespace-nowrap">{item.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {item.expiry ? new Date(item.expiry).toLocaleDateString() : "N/A"}
+                      {item.expiry ? (
+                        new Date(item.expiry).toLocaleDateString()
+                      ) : (
+                        <p className="text-gray-500/50">N/A</p>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {/* Display status with appropriate color coding */}
                       <span
-                        className={`badge badge-outline rounded-full ${
+                        className={`badge badge-lg badge-outline rounded-full ${
                           calculateStatus(item.expiry) === "Expired"
-                            ? "text-red-500"
+                            ? "badge-error"
                             : calculateStatus(item.expiry) === "No date"
-                            ? "text-gray-500"
+                            ? "text-gray-500/50"
                             : calculateStatus(item.expiry) <= 3
-                            ? "text-orange-500"
+                            ? "badge-warning"
                             : ""
                         }`}
                       >
-                        
                         {calculateStatus(item.expiry) === "Expired"
                           ? "Expired"
                           : calculateStatus(item.expiry) === "No date"

@@ -17,7 +17,7 @@ const ProfileModal = ({ isAdmin, session }) => {
   return (
     <>
       <div onClick={openModal}>
-        <a className="flex items-center gap-1 ">
+        <a className="flex items-center lg:text-lg gap-1 ">
           <User2 size={20} />
           Profile
         </a>

@@ -115,7 +115,7 @@ const ThemeToggle = () => {
       <div className="dropdown dropdown-left">
         {/* Theme toggle button */}
         <div tabIndex={0} role="button" className="cursor-pointer">
-          <div className="flex items-center gap-1  ">
+          <div className="flex items-center lg:text-lg gap-1  ">
             <SunMoon size={20} />
             Theme
           </div>
@@ -124,12 +124,12 @@ const ThemeToggle = () => {
         {isOpen && (
           <ul
             tabIndex={0}
-            className="dropdown-content mr-8 ring-2 ring-base-300 menu bg-base-100 rounded-sm z-[1] w-32 p-2 shadow"
+            className="dropdown-content mr-8 ring-2  ring-base-300 menu bg-base-100 rounded-sm z-[1] w-32 p-2 shadow"
           >
             {/* Light theme option */}
             <li>
               <button
-                className={`theme-controller ${
+                className={`theme-controller  ${
                   currentTheme === "light" ? "font-extrabold" : ""
                 }`}
                 onClick={() => setTheme("light")}

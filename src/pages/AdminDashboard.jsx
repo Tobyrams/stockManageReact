@@ -1,43 +1,37 @@
 import React, { useEffect, useState, useContext } from "react";
-import toast, { Toaster } from "react-hot-toast";
-import { supabase } from "../supabaseClient";
-import { Trash2, Info } from "lucide-react";
+import { Navigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { supabase, supabaseAdmin } from "../supabaseClient";
+import { Trash2, Info, UserPlus } from "lucide-react";
 import { Tooltip } from "@material-tailwind/react";
 import { UserContext } from "../contexts/UserContext";
 
 function AdminDashboard() {
-  // State variables
+  // State variables for managing profiles and UI
   const [profiles, setProfiles] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { session, onlineUsers } = useContext(UserContext);
 
-  // Delete confirmation state variables
+  // State for managing delete confirmation modal
   const [deleteConfirmation, setDeleteConfirmation] = useState(null);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+
+  // State for new user creation form
+  const [newUserEmail, setNewUserEmail] = useState("");
+  const [newUserPassword, setNewUserPassword] = useState("");
+  const [newUserRole, setNewUserRole] = useState(1);
 
   // Check user role on component mount
   useEffect(() => {
     checkUserRole();
   }, []);
 
-  //   // Fetch profiles and set up realtime listener when user is admin
-  useEffect(() => {
-    if (isAdmin) {
-      getProfiles();
-    }
-  }, [isAdmin]);
-
-  // Function to check user role
+  // Function to check if the current user has admin role
   const checkUserRole = async () => {
-    // if (!session?.user?.id) {
-    //   //   console.error("No user ID found in session");
-    //   setError("No user ID found. Please log in again.");
-    //   setLoading(false);
-    //   return;
-    // }
-
+    setIsLoading(true);
     const { data, error } = await supabase
       .from("profiles")
       .select("role_id")
@@ -49,11 +43,14 @@ function AdminDashboard() {
       setError(error.message);
     } else {
       setIsAdmin(data.role_id === 2);
+      if (data.role_id === 2) {
+        getProfiles();
+      }
     }
-    setLoading(false);
+    setIsLoading(false);
   };
 
-  // Fetch profiles from Supabase
+  // Fetch all user profiles from Supabase
   async function getProfiles() {
     setLoading(true);
     const { data, error } = await supabase.from("profiles").select();
@@ -66,7 +63,7 @@ function AdminDashboard() {
     setLoading(false);
   }
 
-  // Update user role
+  // Update a user's role in the database
   const updateUserRole = async (userId, newRoleId) => {
     const { error } = await supabase
       .from("profiles")
@@ -78,31 +75,33 @@ function AdminDashboard() {
       toast.error("Error updating user role: " + error.message);
     } else {
       toast.success("User role updated!");
+      getProfiles();
     }
   };
 
-  // Handle delete button click
+  // Handle delete button click to show confirmation modal
   const handleDelete = (id, email) => {
     setDeleteConfirmation({ id, email });
     setIsDeleteModalVisible(true);
   };
 
-  // Cancel delete operation
+  // Cancel delete operation and close modal
   const cancelDelete = () => {
     setIsDeleteModalVisible(false);
     setDeleteConfirmation(null);
   };
 
-  // Confirm delete operation
+  // Confirm delete operation and remove user
   const confirmDelete = async () => {
     if (deleteConfirmation) {
       setIsDeleteModalVisible(false);
       await deleteProfile(deleteConfirmation.id);
       setDeleteConfirmation(null);
+      getProfiles();
     }
   };
 
-  // Delete profile from Supabase
+  // Delete a user profile from Supabase
   async function deleteProfile(id) {
     const { error } = await supabase.from("profiles").delete().eq("id", id);
     if (error) {
@@ -114,7 +113,7 @@ function AdminDashboard() {
     }
   }
 
-  // Format date and time
+  // Format date and time for display
   const formatDateTime = (dateString) => {
     const options = {
       year: "numeric",
@@ -128,10 +127,61 @@ function AdminDashboard() {
     return new Date(dateString).toLocaleString("en-US", options);
   };
 
-  // Render main component
+  // Create a new user with specified email, password, and role
+  const createNewUser = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // Create user using Supabase Admin API
+      const { data, error } = await supabaseAdmin.auth.admin.createUser({
+        email: newUserEmail,
+        password: newUserPassword,
+        email_confirm: true, // Automatically confirm the email
+      });
+
+      if (error) throw error;
+
+      // Update the user's role in the profiles table
+      const { error: profileError } = await supabaseAdmin
+        .from("profiles")
+        .update({ role_id: newUserRole })
+        .eq("id", data.user.id);
+
+      if (profileError) throw profileError;
+
+      // Success handling
+      toast.success("New user created!");
+      setNewUserEmail("");
+      setNewUserPassword("");
+      setNewUserRole(1);
+      getProfiles(); // Refresh the profiles list
+    } catch (error) {
+      console.error("Error creating user:", error);
+      toast.error("Error creating user: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Loading spinner for admin dashboard
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="loading loading-ring loading-lg"></div>
+      </div>
+    );
+  }
+
+  // Redirect to dashboard if user is not admin
+  if (!isAdmin) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   return (
     <div className="p-5 sm:p-10 font-poppins animate__animated animate__fadeIn ">
-      <Toaster />
+      {/* <Toaster /> */}
+      {/* Profiles table card */}
       <div className="card bg-base-100 shadow-xl ring-2 ring-base-300 mb-8">
         <div className="card-body">
           <h1 className="card-title text-2xl font-bold mb-4 text-shadow">
@@ -140,6 +190,7 @@ function AdminDashboard() {
 
           {/* Profiles table */}
           {loading ? (
+            // Loading Skeleton for profiles table
             <div className="overflow-x-auto">
               <table className="table w-full">
                 <thead>
@@ -163,7 +214,7 @@ function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {[...Array(5)].map((_, index) => (
+                  {[...Array(10)].map((_, index) => (
                     <tr key={index}>
                       <td>
                         <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
@@ -186,6 +237,7 @@ function AdminDashboard() {
               </table>
             </div>
           ) : (
+            // Profiles table
             <div className="overflow-x-auto">
               <table className="table table-zebra w-full">
                 <thead>
@@ -193,29 +245,25 @@ function AdminDashboard() {
                     <th>Email</th>
                     <th>Created At</th>
                     <th>Role</th>
-                    <th className="flex items-center">
-                      Online
-                      <div className="ml-2">
-                        <Tooltip
-                          content={
-                            <>
-                              <span className="mr-2">Status:</span>
-                              <span className="inline-block w-3 h-3 rounded-full bg-success mr-1"></span>
-                              <span className="text-success mr-2">
-                                Online
-                              </span>
-                              <span className="inline-block w-3 h-3 rounded-full bg-error mr-1"></span>
-                              <span className="text-error">Offline</span>
-                            </>
-                          }
-                          placement="right"
-                        >
-                          <Info
-                            size={16}
-                            className="inline-block ml-2 cursor-help"
-                          />
-                        </Tooltip>
-                      </div>
+                    <th className="flex items-start relative justify-center">
+                      Status
+                      <Tooltip
+                        content={
+                          <>
+                            <span className="mr-2">Status:</span>
+                            <span className="inline-block w-3 h-3 rounded-full bg-success mr-1"></span>
+                            <span className="text-success mr-2">Online</span>
+                            <span className="inline-block w-3 h-3 rounded-full bg-error mr-1"></span>
+                            <span className="text-error">Offline</span>
+                          </>
+                        }
+                        placement="bottom"
+                      >
+                        <Info
+                          size={16}
+                          className="inline-block ml-2 cursor-help text-gray-600 opacity-50"
+                        />
+                      </Tooltip>
                     </th>
                     <th>Actions</th>
                   </tr>
@@ -231,14 +279,14 @@ function AdminDashboard() {
                           onChange={(e) =>
                             updateUserRole(profile.id, parseInt(e.target.value))
                           }
-                          className="select ring-1 ring-base-300 rounded-full select-sm w-full max-w-xs"
+                          className="select select-bordered select-sm  max-w-[100px]"
                         >
                           <option value={1}>User</option>
                           <option value={2}>Admin</option>
                           <option value={3}>Chef</option>
                         </select>
                       </td>
-                      <td>
+                      <td className="flex items-center justify-center">
                         <div
                           className={`w-3 h-3 rounded-full ${
                             onlineUsers[profile.id]
@@ -298,6 +346,80 @@ function AdminDashboard() {
               )}
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* New User Creation Card */}
+      <div className="card bg-base-100 shadow-xl ring-2 ring-base-300 mt-8">
+        <div className="card-body">
+          <h2 className="card-title text-2xl font-bold mb-4 text-shadow">
+            Create New User
+          </h2>
+          <form
+            onSubmit={createNewUser}
+            className="space-y-4"
+            autocomplete="off"
+          >
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Email</span>
+              </label>
+              <input
+                type="email"
+                placeholder="Enter email"
+                className="input input-bordered"
+                value={newUserEmail}
+                onChange={(e) => setNewUserEmail(e.target.value)}
+                required
+                autocomplete="off"
+              />
+            </div>
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Password</span>
+              </label>
+              <input
+                type="password"
+                placeholder="Enter password"
+                className="input input-bordered"
+                value={newUserPassword}
+                onChange={(e) => setNewUserPassword(e.target.value)}
+                required
+                autocomplete="new-password"
+              />
+            </div>
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Role</span>
+              </label>
+              <select
+                value={newUserRole}
+                onChange={(e) => setNewUserRole(parseInt(e.target.value))}
+                className="select select-bordered"
+                autocomplete="off"
+              >
+                <option value={1}>User</option>
+                <option value={2}>Admin</option>
+                <option value={3}>Chef</option>
+              </select>
+            </div>
+            <div className="form-control mt-6">
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={loading}
+              >
+                {loading ? (
+                  <span className="loading loading-spinner"></span>
+                ) : (
+                  <>
+                    <UserPlus size={20} className="mr-2" />
+                    Create User
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

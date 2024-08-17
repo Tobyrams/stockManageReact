@@ -79,19 +79,17 @@ function Header({ isAdmin, session, handleLogout }) {
     }
   };
 
-  
-
   return (
     <>
       {/* Navbar */}
-      <nav className="navbar shadow-md bg-base-100 font-poppins relative  ring-2 ring-base-300">
+      <nav className="navbar shadow-md bg-base-100 font-poppins relative ring-2 ring-base-300">
         {/* Sidebar Component */}
         <div className="flex-none">
           <SideBarComponent isAdmin={isAdmin} handleLogout={handleLogout} />
         </div>
 
         {/* Header Title */}
-        <div className="flex justify-center text-center w-full items-center">
+        <div className="flex-1 justify-center text-center items-center">
           <span className="text-2xl md:text-3xl lg:text-4xl font-semibold pl-2 text-shadow-sm">
             {getPageTitle()}
           </span>
@@ -101,24 +99,14 @@ function Header({ isAdmin, session, handleLogout }) {
         <div className="flex-none">
           <div className="dropdown dropdown-end">
             {/* Dropdown Btn */}
-            <Tooltip
-              content="More"
-              placement="left"
-              animate={{
-                mount: { scale: 1, x: 0 },
-                unmount: { scale: 0, x: 25 },
-              }}
-              className="hidden lg:flex ring-2 ring-base-300 bg-base-100 text-base-content"
-            >
-              <Button variant="text" size="sm" className="text-base-content">
-                <Ellipsis size={30} />
-              </Button>
-            </Tooltip>
+            <label tabIndex={0} className="btn btn-ghost btn-circle">
+              <Ellipsis size={30} />
+            </label>
 
             {/* Dropdown Content */}
             <ul
-              tabIndex="0"
-              className="menu menu-md dropdown-content ring-2 ring-base-300 bg-base-100 rounded-sm z-[1] mt-3 w-40 p-2 shadow-md "
+              tabIndex={0}
+              className="menu menu-xs dropdown-content mt-3 z-[1] p-2 ring-2 ring-base-300 shadow bg-base-100 rounded-sm w-32 sm:w-52"
             >
               <li>
                 <ProfileModal isAdmin={isAdmin} session={session} />
@@ -126,21 +114,6 @@ function Header({ isAdmin, session, handleLogout }) {
               <li>
                 <ThemeToggle />
               </li>
-              {/* <li>
-                <button
-                  onClick={() => navigate("/settings")}
-                  className="flex items-center gap-1"
-                >
-                  <Settings size={20} />
-                  Settings
-                </button>
-              </li>
-              <li>
-                <button onClick={handleLogout}>
-                  <LogOut size={17} />
-                  Logout
-                </button>
-              </li> */}
             </ul>
           </div>
         </div>
