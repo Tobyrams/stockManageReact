@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import logo from "../assets/Tadinda_new_logo_transparent.png";
+import { supabase } from "../supabaseClient"; // Add this import
 
 // Main sidebar component
 function SideBarComponent({ isAdmin, session }) {
@@ -54,8 +55,15 @@ function SideBarComponent({ isAdmin, session }) {
   );
 
   const handleLogout = async () => {
-    toast.success("Logged out");
-    handleNavLinkClick("/");
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      navigate("/");
+      toast.success("Logged out 👋");
+    } catch (error) {
+      console.error("Error signing out:", error.message);
+      toast.error("Failed to log out. Please try again.");
+    }
   };
 
   return (

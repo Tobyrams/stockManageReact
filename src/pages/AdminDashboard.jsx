@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { supabase } from "../supabaseClient";
 import { Trash2, Info } from "lucide-react";
 import { Tooltip } from "@material-tailwind/react";
+import { UserContext } from "../contexts/UserContext";
 
-function AdminDashboard({ session }) {
+function AdminDashboard() {
   // State variables
   const [profiles, setProfiles] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [onlineUsers, setOnlineUsers] = useState({});
+  const { session, onlineUsers } = useContext(UserContext);
 
   // Delete confirmation state variables
   const [deleteConfirmation, setDeleteConfirmation] = useState(null);
@@ -25,10 +26,6 @@ function AdminDashboard({ session }) {
   useEffect(() => {
     if (isAdmin) {
       getProfiles();
-      const presenceChannel = setupPresenceChannel();
-      return () => {
-        presenceChannel.unsubscribe();
-      };
     }
   }, [isAdmin]);
 
@@ -54,39 +51,6 @@ function AdminDashboard({ session }) {
       setIsAdmin(data.role_id === 2);
     }
     setLoading(false);
-  };
-
-  // Set up presence channel for online users
-  const setupPresenceChannel = () => {
-    const channel = supabase.channel("online-users", {
-      config: {
-        presence: {
-          key: session.user.id,
-        },
-      },
-    });
-
-    channel
-      .on("presence", { event: "sync" }, () => {
-        const newState = channel.presenceState();
-        const onlineUsersMap = {};
-        Object.values(newState)
-          .flat()
-          .forEach((user) => {
-            onlineUsersMap[user.user_id] = true;
-          });
-        setOnlineUsers(onlineUsersMap);
-      })
-      .subscribe(async (status) => {
-        if (status === "SUBSCRIBED") {
-          await channel.track({
-            user_id: session.user.id,
-            email: session.user.email,
-          });
-        }
-      });
-
-    return channel;
   };
 
   // Fetch profiles from Supabase
@@ -231,17 +195,17 @@ function AdminDashboard({ session }) {
                     <th>Role</th>
                     <th className="flex items-center">
                       Online
-                      <div className="">
+                      <div className="ml-2">
                         <Tooltip
                           content={
                             <>
                               <span className="mr-2">Status:</span>
-                              <span className="inline-block w-3 h-3 rounded-full bg-green-500 mr-1"></span>
-                              <span className="text-green-500 mr-2">
+                              <span className="inline-block w-3 h-3 rounded-full bg-success mr-1"></span>
+                              <span className="text-success mr-2">
                                 Online
                               </span>
-                              <span className="inline-block w-3 h-3 rounded-full bg-red-500 mr-1"></span>
-                              <span className="text-red-500">Offline</span>
+                              <span className="inline-block w-3 h-3 rounded-full bg-error mr-1"></span>
+                              <span className="text-error">Offline</span>
                             </>
                           }
                           placement="right"

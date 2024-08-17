@@ -3,7 +3,7 @@ import { Navigate, Outlet } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 import Header from "./Header";
 
-const ProtectedRoute = ({ isAdmin, session }) => {
+const ProtectedRoute = ({ isAdmin, session, handleLogout }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
 
   useEffect(() => {
@@ -27,7 +27,7 @@ const ProtectedRoute = ({ isAdmin, session }) => {
 
   return isAuthenticated ? (
     <>
-      <Header isAdmin={isAdmin} session={session} />
+      <Header isAdmin={isAdmin} session={session} handleLogout={handleLogout} />
       <Outlet />
     </>
   ) : (

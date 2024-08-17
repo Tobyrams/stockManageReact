@@ -20,7 +20,7 @@ import { supabase } from "../supabaseClient";
 import { toast } from "react-hot-toast";
 import { Tooltip, Button } from "@material-tailwind/react";
 
-function Header({ isAdmin, session }) {
+function Header({ isAdmin, session, handleLogout }) {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -79,11 +79,7 @@ function Header({ isAdmin, session }) {
     }
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    toast.success("Logged out");
-    navigate("/login");
-  };
+  
 
   return (
     <>
@@ -91,7 +87,7 @@ function Header({ isAdmin, session }) {
       <nav className="navbar shadow-md bg-base-100 font-poppins relative  ring-2 ring-base-300">
         {/* Sidebar Component */}
         <div className="flex-none">
-          <SideBarComponent isAdmin={isAdmin} />
+          <SideBarComponent isAdmin={isAdmin} handleLogout={handleLogout} />
         </div>
 
         {/* Header Title */}
