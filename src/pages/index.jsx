@@ -7,6 +7,7 @@ import Finances from "./Finances";
 import LoginPage from "./LoginPage";
 import AdminDashboard from "./AdminDashboard";
 import Settings from "./Settings";
+import PendingUser from "./PendingUser";
 
 export {
   LoginPage,
@@ -18,4 +19,5 @@ export {
   Finances,
   AdminDashboard,
   Settings,
+  PendingUser,
 };

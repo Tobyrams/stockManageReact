@@ -15,6 +15,7 @@ import {
   Stock,
   AdminDashboard,
   Settings,
+  PendingUser,
 } from "./pages";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { Dashboard } from "./pages";
@@ -99,6 +100,7 @@ function App() {
         <Routes>
           {/* Public route */}
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/pending" element={<PendingUser />} />
 
           {/* Protected routes */}
           <Route

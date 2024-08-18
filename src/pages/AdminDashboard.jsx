@@ -307,6 +307,7 @@ function AdminDashboard() {
                           }
                           className="select select-bordered select-sm  max-w-[100px]"
                         >
+                          <option value={0}>Pending</option>
                           <option value={1}>User</option>
                           <option value={2}>Admin</option>
                           <option value={3}>Chef</option>
