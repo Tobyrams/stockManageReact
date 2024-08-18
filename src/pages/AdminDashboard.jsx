@@ -30,6 +30,32 @@ function AdminDashboard() {
     checkUserRole();
   }, []);
 
+  useEffect(() => {
+    fetchProfiles();
+
+    const profilesSubscription = supabase
+    .channel("profiles")
+    .on("postgres_changes", { event: "*", schema: "public", table: "profiles" },
+    handleProfilesChange
+    )
+    .subscribe();
+
+    return () => {
+      supabase.removeChannel(profilesSubscription);
+    };
+  }, []);
+
+  const handleProfilesChange = (payload) => {
+    fetchProfiles();
+  };
+
+  async function fetchProfiles() {
+    setLoading(true);
+    const { data, error } = await supabase.from("profiles").select();
+    setProfiles(data);
+    setLoading(false);
+  }
+
   // Function to check if the current user has admin role
   const checkUserRole = async () => {
     setIsLoading(true);
@@ -323,7 +349,7 @@ function AdminDashboard() {
                         ></div>
                       </td>
                       <td>
-                        {profile.role_id === 1 ? (
+                        {profile.role_id === 1 || profile.role_id === 0 ? (
                           <button
                             className="btn btn-ghost text-error btn-md"
                             onClick={() =>

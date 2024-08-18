@@ -42,7 +42,7 @@ const ProtectedRoute = ({ isAdmin, session, handleLogout }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (userRole === 0) { // Assuming 3 is the role_id for pending users
+  if (userRole === 0) {
     return <Navigate to="/pending" replace />;
   }
 

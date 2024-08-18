@@ -25,9 +25,9 @@ const LoginPage = () => {
 
       // Fetch user's role from the profiles table
       const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('role_id')
-        .eq('id', data.user.id)
+        .from("profiles")
+        .select("role_id")
+        .eq("id", data.user.id)
         .single();
 
       if (profileError) throw profileError;
@@ -36,7 +36,7 @@ const LoginPage = () => {
       switch (profileData.role_id) {
         case 0:
           navigate("/pending");
-          toast('Your account is pending approval', { icon: '⚠️' });
+          toast("Pending Admin Approval", { icon: "⚠️" });
           break;
         case 1:
         case 2:
@@ -54,7 +54,9 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-5">
       {/* Page title and description */}
-      <h2 className="text-4xl font-bold text-center mb-2">{isSignup ? "Sign Up" : "Login"}</h2>
+      <h2 className="text-4xl font-bold text-center mb-2">
+        {isSignup ? "Sign Up" : "Login"}
+      </h2>
       <p className="text-center font-medium text-sm text-base-content/70 mb-4">
         {isSignup ? "Create your account" : "Enter your login information"}
       </p>
@@ -105,7 +107,9 @@ const LoginPage = () => {
               onClick={() => setIsSignup(!isSignup)}
               className="btn btn-link"
             >
-              {isSignup ? "Already have an account? Login" : "Need an account? Sign Up"}
+              {isSignup
+                ? "Already have an account? Login"
+                : "Need an account? Sign Up"}
             </button>
           </div>
         </div>
