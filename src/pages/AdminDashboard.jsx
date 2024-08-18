@@ -14,6 +14,7 @@ function AdminDashboard() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { session, onlineUsers } = useContext(UserContext);
+  const [userSessions, setUserSessions] = useState({});
 
   // State for managing delete confirmation modal
   const [deleteConfirmation, setDeleteConfirmation] = useState(null);
@@ -53,14 +54,33 @@ function AdminDashboard() {
   // Fetch all user profiles from Supabase
   async function getProfiles() {
     setLoading(true);
-    const { data, error } = await supabase.from("profiles").select();
-    if (error) {
-      console.error("Error fetching profiles:", error);
+    try {
+      // Fetch profiles
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("*");
+
+      if (profilesError) throw profilesError;
+
+      // Fetch user sessions
+      const { data: sessionsData, error: sessionsError } = await supabaseAdmin.auth.admin.listUsers();
+
+      if (sessionsError) throw sessionsError;
+
+      // Create a map of user IDs to their last sign in time
+      const sessionsMap = {};
+      sessionsData.users.forEach(user => {
+        sessionsMap[user.id] = user.last_sign_in_at;
+      });
+
+      setProfiles(profilesData);
+      setUserSessions(sessionsMap);
+    } catch (error) {
+      console.error("Error fetching profiles and sessions:", error);
       setError(error.message);
-    } else {
-      setProfiles(data);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   // Update a user's role in the database
@@ -197,6 +217,7 @@ function AdminDashboard() {
                   <tr>
                     <th>Email</th>
                     <th>Created At</th>
+                    <th>Last Sign In</th>
                     <th>Role</th>
                     <th>
                       Online
@@ -223,6 +244,9 @@ function AdminDashboard() {
                         <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
                       </td>
                       <td>
+                        <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+                      </td>
+                      <td>
                         <div className="h-8 bg-gray-200 rounded w-24 animate-pulse"></div>
                       </td>
                       <td>
@@ -244,6 +268,7 @@ function AdminDashboard() {
                   <tr className="text-lg">
                     <th>Email</th>
                     <th>Created At</th>
+                    <th>Last Sign In</th>
                     <th>Role</th>
                     <th className="flex items-start relative justify-center">
                       Status
@@ -273,6 +298,7 @@ function AdminDashboard() {
                     <tr key={profile.id}>
                       <td>{profile.email}</td>
                       <td>{formatDateTime(profile.created_at)}</td>
+                      <td>{userSessions[profile.id] ? formatDateTime(userSessions[profile.id]) : 'Never'}</td>
                       <td>
                         <select
                           value={profile.role_id}

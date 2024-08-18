@@ -13,6 +13,22 @@ import { supabase } from "../supabaseClient";
 import { useStockSubscription_StockPG } from "../hooks/useStockSubscription";
 import { useCategorySubscription } from "../hooks/useCategorySubscription";
 
+const formatExpiryDate = (dateString) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = date.toLocaleString("default", { month: "short" });
+  const day = date.getDate().toString().padStart(2, "0");
+  return `${day} ${month} ${year}`;
+};
+
+const formatDate = (date) => {
+  const year = date.getFullYear();
+  const month = date.toLocaleString("default", { month: "short" });
+  const day = date.getDate().toString().padStart(2, "0");
+  return `${day} ${month} ${year}`;
+};
+
 const Stock = ({ isAdmin, session }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState("name");
@@ -223,9 +239,9 @@ const Stock = ({ isAdmin, session }) => {
         )}
       </div>
 
-      <p className="text-xl text-base-content text-shadow pb-5">
+      <p className="text-xl text-base-content text-shadow py-5">
         <span className="font-bold">Today's Date: </span>
-        {new Date().toLocaleDateString()}
+        {formatDate(new Date())}
       </p>
 
       <div className="card bg-base-100 shadow-xl ring-2 ring-base-300">
@@ -290,28 +306,31 @@ const Stock = ({ isAdmin, session }) => {
               </thead>
               <tbody>
                 {isLoading
-                  ? Array(5)
+                  ? Array(20)
                       .fill()
                       .map((_, index) => (
                         <tr key={index}>
                           <td>
-                            <div className="h-4 bg-gray-300 rounded animate-pulse"></div>
+                            <div className="h-4 w-20 bg-gray-300 rounded animate-pulse"></div>
                           </td>
                           <td>
-                            <div className="h-4 bg-gray-300 rounded animate-pulse"></div>
+                            <div className="h-4 w-20 bg-gray-300 rounded animate-pulse"></div>
                           </td>
                           <td>
-                            <div className="h-4 bg-gray-300 rounded animate-pulse"></div>
+                            <div className="h-4 w-20 bg-gray-300 rounded animate-pulse"></div>
                           </td>
                           <td>
-                            <div className="h-4 bg-gray-300 rounded animate-pulse"></div>
+                            <div className="h-4 w-20 bg-gray-300 rounded animate-pulse"></div>
                           </td>
                           <td>
-                            <div className="h-4 bg-gray-300 rounded animate-pulse"></div>
+                            <div className="h-4 w-20 bg-gray-300 rounded animate-pulse"></div>
                           </td>
                           {isAdmin && (
                             <td>
-                              <div className="h-4 bg-gray-300 rounded animate-pulse"></div>
+                              <div className="flex items-center gap-2">
+                                <div className="h-6 w-6 bg-gray-300 rounded animate-pulse"></div>
+                                <div className="h-6 w-6 bg-gray-300 rounded animate-pulse"></div>
+                              </div>
                             </td>
                           )}
                         </tr>
@@ -321,10 +340,10 @@ const Stock = ({ isAdmin, session }) => {
                         <td>{stock.name}</td>
                         <td>{stock.quantity}</td>
                         <td>{stock.unit}</td>
-                        <td>{stock.expiry}</td>
+                        <td>{formatExpiryDate(stock.expiry)}</td>
                         <td>{getCategoryName(stock.category_id)}</td>
                         {isAdmin && (
-                          <td>
+                          <td className="flex items-center ">
                             <Tooltip
                               content="Edit"
                               placement="top"
@@ -372,137 +391,32 @@ const Stock = ({ isAdmin, session }) => {
       </div>
 
       {/* Add New Item Modal */}
-      <input
-        type="checkbox"
-        id="add-item-modal"
-        className="modal-toggle"
-        checked={isModalOpen}
-        onChange={() => setIsModalOpen(!isModalOpen)}
-      />
-      <div className="modal modal-bottom sm:modal-middle ">
-        <div className="modal-box ">
-          <h3 className="font-semibold text-3xl sm:text-4xl md:text-5xl text-center">
-            Add New Item
-          </h3>
-          <h3 className="font-medium opacity-50 text-md sm:text-lg md:text-xl lg:text-xl text-center pb-10">
-            Enter details for new item
-          </h3>
-          <form onSubmit={handleSubmit}>
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">Product Name</span>
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={newItem.name}
-                onChange={handleInputChange}
-                className="input input-bordered"
-                required
-              />
-            </div>
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">Quantity</span>
-              </label>
-              <input
-                type="number"
-                name="quantity"
-                value={newItem.quantity}
-                onChange={handleInputChange}
-                className="input input-bordered"
-                required
-              />
-            </div>
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">Unit of Measurement <span className="text-sm text-gray-500">(Optional)</span></span>
-              </label>
-              <input
-                type="text"
-                name="unit"
-                value={newItem.unit || "-"}
-                onChange={handleInputChange}
-                className="input input-bordered"
-              />
-            </div>
-            <div className="form-control">
-              <label className="label">
-                <p className="label-text">Expiry Date <span className="text-sm text-gray-500">(Optional)</span></p>
-              </label>
-              <input
-                type="date"
-                name="expiry"
-                value={newItem.expiry}
-                onChange={handleInputChange}
-                className="input input-bordered"
-              />
-            </div>
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">Category</span>
-              </label>
-              <select
-                name="category_id"
-                value={newItem.category_id}
-                onChange={handleInputChange}
-                className="select select-bordered"
-                required
-              >
-                <option value="">Select a category</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="modal-action">
-              <button type="submit" className="btn btn-primary">
-                Add Item
-              </button>
-              <button
-                htmlFor="add-item-modal"
-                className="btn"
-                onClick={handleModalClose}
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-        <label className="modal-backdrop" htmlFor="add-item-modal">
-          Close
-        </label>
-      </div>
-
-      {/* Edit Item Modal */}
-      <input
-        type="checkbox"
-        id="edit-item-modal"
-        className="modal-toggle "
-        checked={isEditModalOpen}
-        onChange={() => setIsEditModalOpen(!isEditModalOpen)}
-      />
-      <div className="modal modal-bottom sm:modal-middle">
-        <div className="modal-box">
-          <h3 className="font-semibold text-3xl sm:text-4xl md:text-5xl text-center">
-            Edit Item
-          </h3>
-          <h3 className="font-medium opacity-50 text-md sm:text-lg md:text-xl lg:text-xl text-center pb-10">
-            Update details for the item
-          </h3>
-          {editItem && (
-            <form onSubmit={handleUpdate}>
+      <>
+        <input
+          type="checkbox"
+          id="add-item-modal"
+          className="modal-toggle"
+          checked={isModalOpen}
+          onChange={() => setIsModalOpen(!isModalOpen)}
+        />
+        <div className="modal modal-bottom sm:modal-middle ">
+          <div className="modal-box ">
+            <h3 className="font-semibold text-3xl sm:text-4xl md:text-5xl text-center">
+              Add New Item
+            </h3>
+            <h3 className="font-medium opacity-50 text-md sm:text-lg md:text-xl lg:text-xl text-center pb-10">
+              Enter details for new item
+            </h3>
+            <form onSubmit={handleSubmit}>
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">Stock Name</span>
+                  <span className="label-text">Product Name</span>
                 </label>
                 <input
                   type="text"
                   name="name"
-                  value={editItem.name}
-                  onChange={handleEditInputChange}
+                  value={newItem.name}
+                  onChange={handleInputChange}
                   className="input input-bordered"
                   required
                 />
@@ -511,69 +425,43 @@ const Stock = ({ isAdmin, session }) => {
                 <label className="label">
                   <span className="label-text">Quantity</span>
                 </label>
-                <div className="flex items-center gap-2 ">
-                  <input
-                    type="number"
-                    name="quantity"
-                    value={editItem.quantity}
-                    onChange={handleEditInputChange}
-                    className="input input-bordered w-full "
-                    required
-                  />
-                  <button
-                    type="button"
-                    className="btn btn-primary btn-outline btn-square btn-md "
-                    onClick={() =>
-                      handleEditInputChange({
-                        target: {
-                          name: "quantity",
-                          value: Math.max(0, parseInt(editItem.quantity) - 1),
-                        },
-                      })
-                    }
-                  >
-                    <Minus size={18} />
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-primary btn-outline btn-square btn-md"
-                    onClick={() =>
-                      handleEditInputChange({
-                        target: {
-                          name: "quantity",
-                          value: parseInt(editItem.quantity) + 1,
-                        },
-                      })
-                    }
-                  >
-                    <Plus size={18} />
-                  </button>
-                </div>
-              </div>
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">Unit of Measurement</span>
-                </label>
                 <input
-                  type="text"
-                  name="unit"
-                  value={editItem.unit || "-"}
-                  onChange={handleEditInputChange}
+                  type="number"
+                  name="quantity"
+                  value={newItem.quantity}
+                  onChange={handleInputChange}
                   className="input input-bordered"
-                  
+                  required
                 />
               </div>
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">Expiry Date</span>
+                  <span className="label-text">
+                    Unit of Measurement{" "}
+                    <span className="text-sm text-gray-500">(Optional)</span>
+                  </span>
+                </label>
+                <input
+                  type="text"
+                  name="unit"
+                  value={newItem.unit || ""}
+                  onChange={handleInputChange}
+                  className="input input-bordered"
+                />
+              </div>
+              <div className="form-control">
+                <label className="label">
+                  <p className="label-text">
+                    Expiry Date{" "}
+                    <span className="text-sm text-gray-500">(Optional)</span>
+                  </p>
                 </label>
                 <input
                   type="date"
                   name="expiry"
-                  value={editItem.expiry}
-                  onChange={handleEditInputChange}
+                  value={newItem.expiry}
+                  onChange={handleInputChange}
                   className="input input-bordered"
-                  
                 />
               </div>
               <div className="form-control">
@@ -582,8 +470,8 @@ const Stock = ({ isAdmin, session }) => {
                 </label>
                 <select
                   name="category_id"
-                  value={editItem.category_id}
-                  onChange={handleEditInputChange}
+                  value={newItem.category_id}
+                  onChange={handleInputChange}
                   className="select select-bordered"
                   required
                 >
@@ -597,23 +485,162 @@ const Stock = ({ isAdmin, session }) => {
               </div>
               <div className="modal-action">
                 <button type="submit" className="btn btn-primary">
-                  Update
+                  Add Item
                 </button>
-                <label
-                  htmlFor="edit-item-modal"
+                <button
+                  htmlFor="add-item-modal"
                   className="btn"
-                  onClick={handleEditModalClose}
+                  onClick={handleModalClose}
                 >
                   Cancel
-                </label>
+                </button>
               </div>
             </form>
-          )}
+          </div>
+          <label className="modal-backdrop" htmlFor="add-item-modal">
+            Close
+          </label>
         </div>
-        <label className="modal-backdrop" htmlFor="edit-item-modal">
-          Close
-        </label>
-      </div>
+      </>
+
+      {/* Edit Item Modal */}
+      <>
+        <input
+          type="checkbox"
+          id="edit-item-modal"
+          className="modal-toggle "
+          checked={isEditModalOpen}
+          onChange={() => setIsEditModalOpen(!isEditModalOpen)}
+        />
+        <div className="modal modal-bottom sm:modal-middle">
+          <div className="modal-box">
+            <h3 className="font-semibold text-3xl sm:text-4xl md:text-5xl text-center">
+              Edit Item
+            </h3>
+            <h3 className="font-medium opacity-50 text-md sm:text-lg md:text-xl lg:text-xl text-center pb-10">
+              Update details for the item
+            </h3>
+            {editItem && (
+              <form onSubmit={handleUpdate}>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">Stock Name</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={editItem.name}
+                    onChange={handleEditInputChange}
+                    className="input input-bordered"
+                    required
+                  />
+                </div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">Quantity</span>
+                  </label>
+                  <div className="flex items-center gap-2 ">
+                    <input
+                      type="number"
+                      name="quantity"
+                      value={editItem.quantity}
+                      onChange={handleEditInputChange}
+                      className="input input-bordered w-full "
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-outline btn-square btn-md "
+                      onClick={() =>
+                        handleEditInputChange({
+                          target: {
+                            name: "quantity",
+                            value: Math.max(0, parseInt(editItem.quantity) - 1),
+                          },
+                        })
+                      }
+                    >
+                      <Minus size={18} />
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-outline btn-square btn-md"
+                      onClick={() =>
+                        handleEditInputChange({
+                          target: {
+                            name: "quantity",
+                            value: parseInt(editItem.quantity) + 1,
+                          },
+                        })
+                      }
+                    >
+                      <Plus size={18} />
+                    </button>
+                  </div>
+                </div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">Unit of Measurement</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="unit"
+                    value={editItem.unit || ""}
+                    onChange={handleEditInputChange}
+                    className="input input-bordered"
+                  />
+                </div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">Expiry Date</span>
+                  </label>
+                  <input
+                    type="date"
+                    name="expiry"
+                    value={editItem.expiry}
+                    onChange={handleEditInputChange}
+                    className="input input-bordered"
+                  />
+                </div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">Category</span>
+                  </label>
+                  <select
+                    name="category_id"
+                    value={editItem.category_id}
+                    onChange={handleEditInputChange}
+                    className="select select-bordered"
+                    required
+                  >
+                    <option value="">Select a category</option>
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="modal-action">
+                  <button type="submit" className="btn btn-primary">
+                    Update
+                  </button>
+                  <label
+                    htmlFor="edit-item-modal"
+                    className="btn"
+                    onClick={handleEditModalClose}
+                  >
+                    Cancel
+                  </label>
+                </div>
+              </form>
+            )}
+          </div>
+          <label className="modal-backdrop" htmlFor="edit-item-modal">
+            Close
+          </label>
+        </div>
+      </>
 
       {/* Delete Item Modal */}
       {deleteConfirmation && (
@@ -633,11 +660,11 @@ const Stock = ({ isAdmin, session }) => {
                 <b>{deleteConfirmation?.name}</b>"?
               </p>
               <div className="modal-action">
+                <button className="btn btn-error" onClick={confirmDelete}>
+                  Yes, Delete
+                </button>
                 <button className="btn btn-ghost" onClick={cancelDelete}>
                   Cancel
-                </button>
-                <button className="btn btn-error" onClick={confirmDelete}>
-                  Delete
                 </button>
               </div>
             </div>

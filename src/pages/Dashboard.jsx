@@ -41,8 +41,13 @@ function Dashboard() {
                 Expiry Tracking
               </h2>
             </div>
-            <span className="text-md text-gray-500 text-shadow">
-              <b>Today - </b> {new Date().toLocaleDateString()}
+            <span className="text-md text-gray-500 text-shadow ">
+              <b>Today - </b>{" "}
+              {new Date().toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "short",
+                year: "2-digit",
+              })}
             </span>
           </div>
           {/* Table to display stock items */}
@@ -68,7 +73,11 @@ function Dashboard() {
                     <td className="px-6 py-4 whitespace-nowrap">{item.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {item.expiry ? (
-                        new Date(item.expiry).toLocaleDateString()
+                        new Date(item.expiry).toLocaleDateString("en-GB", {
+                          day: "numeric",
+                          month: "short",
+                          year: "2-digit",
+                        })
                       ) : (
                         <p className="text-gray-500/50">N/A</p>
                       )}
@@ -90,6 +99,8 @@ function Dashboard() {
                           ? "Expired"
                           : calculateStatus(item.expiry) === "No date"
                           ? "No date"
+                          : calculateStatus(item.expiry) === 0
+                          ? "Expires Today"
                           : `${calculateStatus(item.expiry)} day${
                               calculateStatus(item.expiry) !== 1 ? "s" : ""
                             } left`}
