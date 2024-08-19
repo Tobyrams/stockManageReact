@@ -12,6 +12,7 @@ import {
 import { supabase } from "../supabaseClient";
 import { useStockSubscription_StockPG } from "../hooks/useStockSubscription";
 import { useCategorySubscription } from "../hooks/useCategorySubscription";
+// import { useAuth } from "../hooks/useAuth"; // Add this import
 
 const formatExpiryDate = (dateString) => {
   if (!dateString) return "";
@@ -36,6 +37,7 @@ const Stock = ({ isAdmin, session }) => {
   const { stocks, isLoading } = useStockSubscription_StockPG();
   const { categories } = useCategorySubscription();
   const [categorySearchTerm, setCategorySearchTerm] = useState("");
+  // const { user } = useAuth(); // Add this line to get the current user
 
   // Function to get the category name from a category ID
   const getCategoryName = (categoryId) => {
@@ -52,6 +54,7 @@ const Stock = ({ isAdmin, session }) => {
     unit: "",
     expiry: "",
     category_id: "",
+    last_updated_by: "",
   });
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -100,7 +103,12 @@ const Stock = ({ isAdmin, session }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { data, error } = await supabase.from("stocks").insert([newItem]);
+    const { data, error } = await supabase.from("stocks").insert([
+      {
+        ...newItem,
+        last_updated_by: session.user.email, 
+      },
+    ]);
 
     if (error) {
       toast.error("Error adding new item");
@@ -136,7 +144,10 @@ const Stock = ({ isAdmin, session }) => {
     e.preventDefault();
     const { data, error } = await supabase
       .from("stocks")
-      .update(editItem)
+      .update({
+        ...editItem,
+        last_updated_by: session.user.email, // Add the user's email
+      })
       .eq("id", editItem.id);
 
     if (error) {
@@ -298,9 +309,14 @@ const Stock = ({ isAdmin, session }) => {
                     </div>
                   </th>
                   {isAdmin && (
+                    <>
+                    <th className="text-xs sm:text-sm md:text-base lg:text-lg">
+                      Last updated by
+                    </th>
                     <th className="text-xs sm:text-sm md:text-base lg:text-lg">
                       Actions
                     </th>
+                    </>
                   )}
                 </tr>
               </thead>
@@ -310,6 +326,9 @@ const Stock = ({ isAdmin, session }) => {
                       .fill()
                       .map((_, index) => (
                         <tr key={index}>
+                          <td>
+                            <div className="h-4 w-20 bg-gray-300 rounded animate-pulse"></div>
+                          </td>
                           <td>
                             <div className="h-4 w-20 bg-gray-300 rounded animate-pulse"></div>
                           </td>
@@ -342,6 +361,7 @@ const Stock = ({ isAdmin, session }) => {
                         <td>{stock.unit}</td>
                         <td>{formatExpiryDate(stock.expiry)}</td>
                         <td>{getCategoryName(stock.category_id)}</td>
+                        {isAdmin && <td>{stock.last_updated_by}</td>}
                         {isAdmin && (
                           <td className="flex items-center ">
                             <Tooltip

@@ -105,7 +105,7 @@ const LoginPage = () => {
           <div className="text-center mt-4">
             <button
               onClick={() => setIsSignup(!isSignup)}
-              className="btn btn-link"
+              className="btn btn-link text-base-content/70 hover:text-primary"
             >
               {isSignup
                 ? "Already have an account? Login"

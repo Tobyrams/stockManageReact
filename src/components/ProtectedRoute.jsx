@@ -1,54 +1,71 @@
 import React, { useEffect, useState } from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 import Header from "./Header";
 
-const ProtectedRoute = ({ isAdmin, session, handleLogout }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
-  const [userRole, setUserRole] = useState(null);
+// ProtectedRoute component to handle authentication and authorization
+const ProtectedRoute = ({ isAdmin, session }) => {
+  // State to store authentication status and user role
+  const [authState, setAuthState] = useState({ isAuthenticated: null, userRole: null });
+  const location = useLocation();
 
   useEffect(() => {
+    // Function to check user authentication and fetch user role
     const checkAuth = async () => {
+      // Get current user from Supabase
       const { data: { user } } = await supabase.auth.getUser();
-      setIsAuthenticated(!!user);
+      
+      if (!user) {
+        // If no user, set authentication state to false
+        setAuthState({ isAuthenticated: false, userRole: null });
+        return;
+      }
 
-      if (user) {
+      try {
+        // Fetch user role from profiles table
         const { data, error } = await supabase
           .from("profiles")
           .select("role_id")
           .eq("id", user.id)
           .single();
 
-        if (error) {
-          console.error("Error fetching user role:", error);
-        } else {
-          setUserRole(data.role_id);
-        }
+        if (error) throw error;
+
+        // Set authentication state with user role
+        setAuthState({ isAuthenticated: true, userRole: data.role_id });
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        // Set authenticated but with null role if there's an error
+        setAuthState({ isAuthenticated: true, userRole: null });
       }
     };
-    checkAuth();
-  }, []);
 
-  if (isAuthenticated === null || userRole === null) {
+    checkAuth();
+  }, []); // Run once on component mount
+
+  // Show loading spinner while checking authentication
+  if (authState.isAuthenticated === null) {
     return (
-      // Loading spinner
       <div className="flex items-center justify-center h-screen">
-        <div className="w-16 h-16 border-t-4 border-b-4 border-gray-500 rounded-full loading loading-ring"></div>
+        <div className="  rounded-full loading loading-ring loading-lg mt-32"></div>
       </div>
     );
   }
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+  // Redirect to login if not authenticated
+  if (!authState.isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (userRole === 0) {
+  // Redirect to pending page if user role is 0 (pending approval)
+  if (authState.userRole === 0) {
     return <Navigate to="/pending" replace />;
   }
 
+  // Render protected content with Header and Outlet for nested routes
   return (
     <>
-      <Header isAdmin={isAdmin} session={session} handleLogout={handleLogout} />
+      <Header isAdmin={isAdmin} session={session} />
       <Outlet />
     </>
   );
